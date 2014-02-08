@@ -21,6 +21,7 @@
             <modules>
                 <module>framework/freedomotic-model</module>
                 <module>framework/freedomotic-core</module>
+                 <module>framework/freedomotic-api</module>
             </modules>
         </profile>
         <profile>

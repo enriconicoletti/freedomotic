@@ -1,22 +1,20 @@
 /**
  *
- * Copyright (c) 2009-2013 Freedomotic team
- * http://freedomotic.com
+ * Copyright (c) 2009-2013 Freedomotic team http://freedomotic.com
  *
  * This file is part of Freedomotic
  *
- * This Program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * This Program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2, or (at your option) any later version.
  *
- * This Program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This Program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Freedomotic; see the file COPYING.  If not, see
+ * You should have received a copy of the GNU General Public License along with
+ * Freedomotic; see the file COPYING. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package com.freedomotic.model.object;
@@ -24,21 +22,18 @@ package com.freedomotic.model.object;
 import com.freedomotic.model.geometry.FreedomShape;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
-/**
- *
- * @author nicoletti
- */
 public class EnvObject implements Serializable {
 
     private static final long serialVersionUID = -7253889516478184321L;
-	
-	private String name;
+
+    private String name;
     private String description;
     private String actAs;
     private String type;
@@ -46,112 +41,72 @@ public class EnvObject implements Serializable {
     private String hierarchy;
     private String protocol;
     private String phisicalAddress;
-    private List<Behavior> behaviors;
-    private List<Representation> representation ; //= new ArrayList<Representation>();
-    private Set<String> tags;
-    private Properties actions;
-    private Properties triggers;
+    private final List<Behavior> behaviors;
+    private final List<Representation> representation;
+    private  Set<String> tags;
+    private final Properties actions;
+    private final Properties triggers;
     private int currentRepresentation;
     private String envUUID;
 
-    /**
-     *
-     * @return
-     */
+    public EnvObject() {
+        this.behaviors = new ArrayList<Behavior>();
+        this.representation = new ArrayList<Representation>();
+        this.actions = new Properties();
+        this.triggers = new Properties();
+        this.tags = new HashSet<String>();
+    }
+
     @RequiresPermissions("objects:read")
     public String getEnvironmentID() {
         return this.envUUID;
     }
 
-    /**
-     *
-     * @param uuid
-     */
     @RequiresPermissions("objects:update")
     public void setEnvironmentID(String uuid) {
         this.envUUID = uuid;
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public Properties getActions() {
         return actions;
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public Properties getTriggers() {
-        if (triggers == null) {
-            triggers = new Properties();
-        }
-
         return triggers;
     }
 
-    /**
-     *
-     * @param name
-     */
     @RequiresPermissions("objects:update")
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public String getName() {
         return this.name;
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public String getUUID() {
         return uuid;
     }
 
-    /**
-     *
-     * @param uuid
-     */
     @RequiresPermissions("objects:update")
     public void setUUID(String uuid) {
         this.uuid = uuid;
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public String getHierarchy() {
         return hierarchy;
     }
 
-    /**
-     *
-     * @param hierarchy
-     */
     @RequiresPermissions("objects:update")
     public void setHierarchy(String hierarchy) {
         this.hierarchy = hierarchy;
     }
 
-    /**
-     *
-     * @param index
-     */
     @RequiresPermissions("objects:update")
     public void setCurrentRepresentation(int index) {
         if (representation.get(index) != null) {
@@ -159,37 +114,37 @@ public class EnvObject implements Serializable {
         }
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public Representation getCurrentRepresentation() {
         return representation.get(currentRepresentation);
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public int getCurrentRepresentationIndex() {
         return currentRepresentation;
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public List<Representation> getRepresentations() {
-        return representation;
+        return Collections.unmodifiableList(representation);
     }
 
-    /**
-     *
-     * @return
-     */
+    @RequiresPermissions("objects:update")
+    public void setRepresentations(List<Representation> representation) {
+        if (representation != null && !representation.isEmpty()) {
+            this.representation.clear();
+            this.representation.addAll(representation);
+        }
+    }
+
+    @RequiresPermissions("objects:update")
+    public void setBehaviors(List<Behavior> behaviors) {
+        if (behaviors != null && !behaviors.isEmpty()) {
+            this.behaviors.clear();
+            this.behaviors.addAll(behaviors);
+        }
+    }
+
     @RequiresPermissions("objects:read")
     public String getProtocol() {
         if ((protocol == null) || (protocol.isEmpty())) {
@@ -199,19 +154,11 @@ public class EnvObject implements Serializable {
         return protocol;
     }
 
-    /**
-     *
-     * @param protocol
-     */
     @RequiresPermissions("objects:update")
     public void setProtocol(String protocol) {
         this.protocol = protocol;
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public ArrayList<Behavior> getActiveBehaviors() {
         ArrayList<Behavior> activeBehaviors = new ArrayList<Behavior>();
@@ -224,20 +171,11 @@ public class EnvObject implements Serializable {
         return activeBehaviors;
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public List<Behavior> getBehaviors() {
-        return behaviors;
+        return Collections.unmodifiableList(behaviors);
     }
 
-    /**
-     *
-     * @param behavior
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public Behavior getBehavior(String behavior) {
         for (Behavior b : behaviors) {
@@ -250,64 +188,36 @@ public class EnvObject implements Serializable {
         return null; //this behaviors doesn't exists for this object
     }
 
-    /**
-     *
-     * @param actAs
-     */
     @RequiresPermissions("objects:update")
     public void setActAs(String actAs) {
         this.actAs = actAs;
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public String getActAs() {
         return this.actAs;
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public String getDescription() {
         return description;
     }
 
-    /**
-     *
-     * @param desc
-     */
     @RequiresPermissions("objects:update")
     public void setDescription(String desc) {
         this.description = desc;
     }
 
-    /**
-     *
-     * @param type
-     */
     @RequiresPermissions("objects:update")
     public void setType(String type) {
         this.type = type;
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public String getType() {
         return this.type;
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public String getPhisicalAddress() {
         if ((phisicalAddress == null) || (phisicalAddress.isEmpty())) {
@@ -317,19 +227,11 @@ public class EnvObject implements Serializable {
         return phisicalAddress.trim();
     }
 
-    /**
-     *
-     * @param address
-     */
     @RequiresPermissions("objects:update")
     public void setPhisicalAddress(String address) {
         phisicalAddress = address;
     }
 
-    /**
-     *
-     * @return
-     */
     @RequiresPermissions("objects:read")
     public FreedomShape getShape() {
         return getCurrentRepresentation().getShape();
@@ -366,11 +268,6 @@ public class EnvObject implements Serializable {
         return getType().substring(getType().lastIndexOf(".") + 1).trim().toLowerCase();
     }
 
-    /**
-     *
-     * @param obj
-     * @return
-     */
     @Override
     @RequiresPermissions("objects:read")
     public boolean equals(Object obj) {
@@ -384,17 +281,12 @@ public class EnvObject implements Serializable {
 
         final EnvObject other = (EnvObject) obj;
 
-        if (!this.name.equalsIgnoreCase(other.name)) {
+        if (!this.name.equalsIgnoreCase(other.getName())) {
             //if they have different names they cannot have same address/protocol
             //otherwise are the same object despite of the different name
             if ((this.getPhisicalAddress().equalsIgnoreCase(other.getPhisicalAddress()))
                     && (this.getProtocol().equalsIgnoreCase(other.getProtocol()))) {
-                if ((this.getPhisicalAddress().equalsIgnoreCase("unknown"))
-                        || (this.getProtocol().equalsIgnoreCase("unknown"))) {
-                    return false;
-                } else {
-                    return true;
-                }
+                return (!this.getPhisicalAddress().equalsIgnoreCase("unknown")) && (!this.getProtocol().equalsIgnoreCase("unknown"));
             } else {
                 return false;
             }
@@ -403,10 +295,6 @@ public class EnvObject implements Serializable {
         return true;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     @RequiresPermissions("objects:read")
     public int hashCode() {
@@ -416,52 +304,33 @@ public class EnvObject implements Serializable {
         return hash;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     @RequiresPermissions("objects:read")
     public String toString() {
         return getName();
     }
-    
-    /**
-     *
-     * @return
-     */
+
     @RequiresPermissions("objects:read")
-    public Set<String> getTagsList(){
-        return this.tags;
+    public Set<String> getTagsList() {
+        if (this.tags == null) {
+            this.tags = new HashSet<String>();
+        }
+        return Collections.unmodifiableSet(this.tags);
     }
-    
-    /**
-     *
-     * @return
-     */
-    @RequiresPermissions("objects:read")       
-    public String getTagsString(){
+
+    @RequiresPermissions("objects:read")
+    public String getTagsString() {
         StringBuilder tagString = new StringBuilder();
         Boolean morethanone = false;
-        for (String tag : getTagsList()){
-            if (tag.trim() != ""){
-            if (morethanone){
-                tagString.append(",");
-            }
-            tagString.append(tag.trim());
-            morethanone = true;
+        for (String tag : getTagsList()) {
+            if (!tag.trim().isEmpty()) {
+                if (morethanone) {
+                    tagString.append(",");
+                }
+                tagString.append(tag.trim());
+                morethanone = true;
             }
         }
         return tagString.toString();
     }
-       
-    /**
-     *
-     */
-    public void initTags(){
-        if (this.tags == null){
-            this.tags = new HashSet();
-        }
-    }
-    
 }

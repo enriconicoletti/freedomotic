@@ -21,7 +21,7 @@ import org.junit.runners.model.InitializationError;
  */
 public class GuiceJUnitRunner extends BlockJUnit4ClassRunner {
 
-    private Injector injector;
+    private final Injector injector;
 
     /**
      *

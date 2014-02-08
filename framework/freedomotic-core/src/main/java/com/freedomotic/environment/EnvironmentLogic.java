@@ -23,10 +23,12 @@ import com.freedomotic.api.API;
 import com.freedomotic.app.Freedomotic;
 import com.freedomotic.model.environment.Environment;
 import com.freedomotic.model.environment.Zone;
+import com.freedomotic.model.geometry.FreedomColor;
 import com.freedomotic.model.geometry.FreedomPolygon;
 import com.freedomotic.objects.EnvObjectLogic;
 import com.freedomotic.objects.EnvObjectPersistence;
 import com.freedomotic.objects.impl.Gate;
+import com.freedomotic.security.Auth;
 import com.freedomotic.util.Graph;
 import com.freedomotic.util.UidGenerator;
 import com.google.inject.Inject;
@@ -45,19 +47,15 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
  */
 public final class EnvironmentLogic {
 
-    private Graph graph = null;
-    private Environment pojo = null;
+    private Graph graph;
+    private Environment pojo;
     private List<ZoneLogic> zones = new ArrayList<ZoneLogic>();
     private File source = null;
-    private final API api;
-    
-    /**
-     *
-     * @param api
-     */
+    private final Auth auth;
+
     @Inject
-    public EnvironmentLogic(API api) {
-        this.api = api;
+    public EnvironmentLogic(Auth auth) {
+        this.auth = auth;
     }
 
     /**
@@ -66,7 +64,7 @@ public final class EnvironmentLogic {
      */
     @RequiresPermissions("environments:read")
     public Environment getPojo() {
-        if (api.getAuth().isPermitted("environments:read:" + pojo.getUUID().substring(0, 5))) {
+        if (auth.isPermitted("environments:read:" + pojo.getUUID().substring(0, 5))) {
             return pojo;
         }
         return null;
@@ -183,8 +181,7 @@ public final class EnvironmentLogic {
 
     /**
      *
-     * @return
-     * @deprecated
+     * @return @deprecated
      */
     @Deprecated
     @RequiresPermissions("environments:read")
@@ -226,7 +223,7 @@ public final class EnvironmentLogic {
 
                 if (!zones.contains(room)) {
                     Freedomotic.logger.config("Adding room " + room);
-                    
+
                     this.zones.add(room);
                 } else {
                     Freedomotic.logger.warning("Attempt to add a null or an already existent room " + room);
@@ -243,15 +240,6 @@ public final class EnvironmentLogic {
                 }
             }
         }
-    }
-
-    /**
-     *
-     * @return
-     */
-    @RequiresPermissions("environments:read")
-    public List<ZoneLogic> getZones() {
-        return zones;
     }
 
     /**
@@ -306,6 +294,84 @@ public final class EnvironmentLogic {
     public String toString() {
         return this.getPojo().getName();
     }
-    private static final Logger LOG = Logger.getLogger(EnvironmentLogic.class.getName());
-    
+
+    @RequiresPermissions("environments:read,zones:read")
+    public List<ZoneLogic> getZones() {
+        return zones;
+    }
+
+    /*
+     * ALL THE POJO'S WRAPPER METHODS
+     */
+    @RequiresPermissions("environments:read")
+    public String getUUID() {
+        return this.getPojo().getUUID();
+    }
+
+    @RequiresPermissions("environments:update")
+    public void setUUID(String uuid) {
+        this.getPojo().setUUID(uuid);
+    }
+
+    @RequiresPermissions("environments:read")
+    public String getRenderer() {
+        return this.getPojo().getRenderer();
+    }
+
+    @RequiresPermissions("environments:update")
+    public void setRenderer(String renderer) {
+        this.getPojo().setRenderer(renderer);
+    }
+
+    @RequiresPermissions("environments:read")
+    public String getEnvironmentName() {
+        return this.getPojo().getEnvironmentName();
+    }
+
+    @RequiresPermissions("environments:read")
+    public FreedomPolygon getShape() {
+        //it returns the first zone in the environment. It is considered the Indoor
+        return this.getPojo().getZones().get(0).getShape();
+    }
+
+    @RequiresPermissions("environments:read")
+    public FreedomColor getBackgroundColor() {
+        return this.getPojo().getBackgroundColor();
+    }
+
+    @RequiresPermissions("environments:read")
+    public String getBackgroundImage() {
+        return this.getPojo().getBackgroundImage();
+    }
+
+    @RequiresPermissions("environments:update")
+    public void setBackgroundImage(String backgroundImage) {
+        this.getPojo().setBackgroundImage(backgroundImage);
+    }
+
+    @RequiresPermissions("environments:read")
+    public String getName() {
+        return this.getPojo().getName();
+    }
+
+    @RequiresPermissions("environments:update")
+    public void setName(String name) {
+        this.getPojo().setName(name);
+    }
+
+    @RequiresPermissions("environments:read,zones:read")
+    public Zone getZone(int index) {
+        return this.getPojo().getZones().get(index);
+    }
+
+    @RequiresPermissions("environments:read")
+    public long getWidth() {
+        return this.getPojo().getWidth();
+    }
+
+    @RequiresPermissions("environments:read")
+    public long getHeight() {
+        return this.getPojo().getHeight();
+    }
+
 }

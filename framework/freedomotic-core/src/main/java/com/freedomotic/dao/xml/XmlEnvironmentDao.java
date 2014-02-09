@@ -4,10 +4,6 @@ package com.freedomotic.dao.xml;
  * Implementation of EnvironmentDao interface to read XML file from filesystem.
  * This class should be kept hidden outside  package
  */
-import com.google.inject.Guice;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.XStreamException;
-import com.freedomotic.dao.EnvironmentDao;
 import com.freedomotic.dao.EnvironmentDao;
 import com.freedomotic.environment.EnvironmentLogic;
 import com.freedomotic.exceptions.DaoLayerException;
@@ -17,8 +13,10 @@ import com.freedomotic.persistence.FreedomXStream;
 import com.freedomotic.util.DOMValidateDTD;
 import com.freedomotic.util.Info;
 import com.freedomotic.util.SerialClone;
+import com.google.inject.Guice;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
 import java.io.BufferedWriter;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileWriter;
@@ -33,7 +31,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 
-class XmlEnvironmentDao implements EnvironmentDao {
+
+//REGRESSION: should be package private
+public class XmlEnvironmentDao implements EnvironmentDao {
 
     //this class logger
     private static final Logger LOG = Logger.getLogger(XmlEnvironmentDao.class.getName());
@@ -61,12 +61,12 @@ class XmlEnvironmentDao implements EnvironmentDao {
 
     /**
      * Initialize the filesystem DAO (XML files). Loads any environment XML into
-     * a Java data structure. No need to call it, automatically managed in the constructor
+     * a Java data structure. DO NOT CALL IT, automatically managed in the constructor
      *
      * @throws DaoLayerException
      */
     @Override
-    public final void init() throws DaoLayerException {
+    public final synchronized void init() throws DaoLayerException {
         if (!alreadyInitialized) {
             if (!FOLDER.isDirectory()) {
                 throw new IllegalArgumentException("Expect this to be a directory not a file: " + FOLDER);
@@ -165,7 +165,7 @@ class XmlEnvironmentDao implements EnvironmentDao {
      * @return an <link>EnvironmentLogic<link>
      */
     @Override
-    public EnvironmentLogic findDefaultEnvironment() {
+    public EnvironmentLogic findDefault() {
         return environments.get(0);
     }
 

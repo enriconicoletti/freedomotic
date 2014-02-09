@@ -19,14 +19,13 @@
  */
 package com.freedomotic.environment;
 
-import com.freedomotic.api.API;
 import com.freedomotic.app.Freedomotic;
+import com.freedomotic.dao.EnvObjectDao;
 import com.freedomotic.model.environment.Environment;
 import com.freedomotic.model.environment.Zone;
 import com.freedomotic.model.geometry.FreedomColor;
 import com.freedomotic.model.geometry.FreedomPolygon;
 import com.freedomotic.objects.EnvObjectLogic;
-import com.freedomotic.objects.EnvObjectPersistence;
 import com.freedomotic.objects.impl.Gate;
 import com.freedomotic.security.Auth;
 import com.freedomotic.util.Graph;
@@ -37,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
@@ -52,10 +50,12 @@ public final class EnvironmentLogic {
     private List<ZoneLogic> zones = new ArrayList<ZoneLogic>();
     private File source = null;
     private final Auth auth;
+    private EnvObjectDao objDao;
 
     @Inject
-    public EnvironmentLogic(Auth auth) {
+    public EnvironmentLogic(Auth auth, EnvObjectDao objDao) {
         this.auth = auth;
+        this.objDao=objDao;
     }
 
     /**
@@ -153,16 +153,13 @@ public final class EnvironmentLogic {
         if (zone.getPojo().isRoom()) {
             Room room = (Room) zone;
             room.init(this);
-            Iterator<EnvObjectLogic> it = EnvObjectPersistence.iterator();
             //check if this rooms has gates
-            while (it.hasNext()) {
-                EnvObjectLogic obj = it.next();
+            for (EnvObjectLogic obj : objDao.findAll()) {
                 if (obj instanceof Gate) {
                     Gate gate = (Gate) obj;
                     gate.evaluateGate();
                 }
             }
-
             room.setChanged();
         } else {
             zone.setChanged();
@@ -177,16 +174,6 @@ public final class EnvironmentLogic {
     public void removeZone(ZoneLogic zone) {
         getPojo().getZones().remove(zone.getPojo());
         zones.remove(zone);
-    }
-
-    /**
-     *
-     * @return @deprecated
-     */
-    @Deprecated
-    @RequiresPermissions("environments:read")
-    public int getLastObjectIndex() {
-        return EnvObjectPersistence.size();
     }
 
     /**

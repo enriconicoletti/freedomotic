@@ -99,8 +99,6 @@ public class Plugin
     final static int SAME_VERSION = 0;
     final static int FIRST_IS_OLDER = -1;
     final static int LAST_IS_OLDER = 1;
-    @Inject
-    private API api;
     private BusService busService;
 
     /**
@@ -139,14 +137,6 @@ public class Plugin
      */
     public File getFile() {
         return path;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public API getApi() {
-        return api;
     }
 
     /**
@@ -430,7 +420,7 @@ public class Plugin
      *
      */
     public void loadPermissionsFromManifest() {
-        getApi().getAuth().setPluginPrivileges(this, configuration.getStringProperty("permissions", getApi().getAuth().getPluginDefaultPermission()));
+        //REGRESSION: getApi().getAuth().setPluginPrivileges(this, configuration.getStringProperty("permissions", getApi().getAuth().getPluginDefaultPermission()));
     }
     private static final Logger LOG = Logger.getLogger(Plugin.class.getName());
 }

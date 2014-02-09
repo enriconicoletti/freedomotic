@@ -60,7 +60,7 @@ public class DatabaseEnvironmentDao implements EnvironmentDao {
     }
 
     @Override
-    public EnvironmentLogic findDefaultEnvironment() {
+    public EnvironmentLogic findDefault() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

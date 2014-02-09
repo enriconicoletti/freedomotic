@@ -43,7 +43,7 @@ import java.util.logging.Logger;
 public class AppConfigImpl implements AppConfig {
 
     private static final long serialVersionUID = 1380975976029008480L;
-    private Properties properties = new Properties();
+    private final Properties properties = new Properties();
 
     @Override
     public void setProperty(String key, String value) {

@@ -139,7 +139,7 @@ public class XmlEnvironmentDaoTest {
     }
 
     /**
-     * Test of findDefaultEnvironment method, of class EnvironmentDao.
+     * Test of findDefault method, of class EnvironmentDao.
      *
      * @throws it.freedomotic.exceptions.DaoLayerException
      */
@@ -157,7 +157,7 @@ public class XmlEnvironmentDaoTest {
         assertNotNull(insert);
         
         //find the environment
-        EnvironmentLogic found = envDao.findDefaultEnvironment();
+        EnvironmentLogic found = envDao.findDefault();
         assertNotNull("Find default environment", found);
     }
 

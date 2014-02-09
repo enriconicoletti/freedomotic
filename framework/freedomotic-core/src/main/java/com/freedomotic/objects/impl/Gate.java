@@ -21,8 +21,8 @@
  */
 package com.freedomotic.objects.impl;
 
+import com.freedomotic.dao.EnvironmentDao;
 import com.freedomotic.environment.EnvironmentLogic;
-import com.freedomotic.environment.EnvironmentPersistence;
 import com.freedomotic.environment.Room;
 import com.freedomotic.environment.ZoneLogic;
 import com.freedomotic.model.ds.Config;
@@ -39,37 +39,24 @@ import com.freedomotic.reactions.Trigger;
 import com.freedomotic.reactions.TriggerPersistence;
 import com.freedomotic.util.TopologyUtils;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 
 /**
  *
  * @author Enrico
  */
-public class Gate
-        extends EnvObjectLogic {
-    //suppose from and to are always reflexive from->to; to->from
+public class Gate extends EnvObjectLogic {
 
+    protected final static String BEHAVIOR_OPEN = "open";
+    protected final static String BEHAVIOR_OPENNESS = "openness";
+    private static final Logger LOG = Logger.getLogger(Gate.class.getName());
+    //suppose from and to are always reflexive from->to; to->from
     private Room from;
     private Room to;
-
-    /**
-     *
-     */
     protected RangedIntBehaviorLogic openness;
-
-    /**
-     *
-     */
     protected BooleanBehaviorLogic open;
-
-    /**
-     *
-     */
-    protected final static String BEHAVIOR_OPEN = "open";
-
-    /**
-     *
-     */
-    protected final static String BEHAVIOR_OPENNESS = "openness";
+    @Inject
+    EnvironmentDao envDao;
 
     @Override
     public void init() {
@@ -182,7 +169,7 @@ public class Gate
     @Override
     public final void setChanged(boolean value) {
         //update the room that can be reached
-        for (EnvironmentLogic env : EnvironmentPersistence.getEnvironments()) {
+        for (EnvironmentLogic env : envDao.findAll()) {
             for (ZoneLogic z : env.getZones()) {
                 if (z instanceof Room) {
                     final Room room = (Room) z;
@@ -272,7 +259,7 @@ public class Gate
         FreedomPolygon objShape =
                 TopologyUtils.rotate(TopologyUtils.translate(pojoShape, xoffset, yoffset),
                 (int) representation.getRotation());
-        EnvironmentLogic env = EnvironmentPersistence.getEnvByUUID(getPojo().getEnvironmentID());
+        EnvironmentLogic env = envDao.findByUuid(this.getPojo().getEnvironmentID());
 
         if (env != null) {
             for (Room room : env.getRooms()) {
@@ -468,5 +455,4 @@ public class Gate
         TriggerPersistence.add(turnsOpen);
         TriggerPersistence.add(turnsClosed);
     }
-    private static final Logger LOG = Logger.getLogger(Gate.class.getName());
 }

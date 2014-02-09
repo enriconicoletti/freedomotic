@@ -39,8 +39,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
  *
  * @author enrico
  */
-public class Room
-        extends ZoneLogic {
+public class Room extends ZoneLogic {
 
     private List<Gate> gates;
     private List<Room> reachable;

@@ -26,12 +26,12 @@ package com.freedomotic.core;
 import com.freedomotic.api.EventTemplate;
 import com.freedomotic.app.Freedomotic;
 import com.freedomotic.bus.BusService;
-import com.freedomotic.environment.EnvironmentPersistence;
+import com.freedomotic.dao.EnvObjectDao;
+import com.freedomotic.dao.EnvironmentDao;
 import com.freedomotic.events.MessageEvent;
 import com.freedomotic.exceptions.VariableResolutionException;
 import com.freedomotic.objects.BehaviorLogic;
 import com.freedomotic.objects.EnvObjectLogic;
-import com.freedomotic.objects.EnvObjectPersistence;
 import com.freedomotic.reactions.Command;
 import com.freedomotic.reactions.Reaction;
 import com.freedomotic.reactions.ReactionPersistence;
@@ -54,12 +54,13 @@ import java.util.logging.Logger;
 public final class TriggerCheck {
 
     private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
-    private final EnvironmentPersistence environmentPersistence;
+    private static final Logger LOG = Logger.getLogger(TriggerCheck.class.getName());
+    private final EnvObjectDao objDao;
     private final BusService busService;
 
     @Inject
-    TriggerCheck(EnvironmentPersistence environmentPersistence, BusService busService) {
-        this.environmentPersistence = environmentPersistence;
+    TriggerCheck(EnvObjectDao objDao, BusService busService) {
+        this.objDao = objDao;
         this.busService = busService;
     }
 
@@ -140,13 +141,12 @@ public final class TriggerCheck {
         if ((protocol != null) && (address != null)) {
             String clazz = event.getProperty("object.class");
             String name = event.getProperty("object.name");
-            affectedObjects = EnvObjectPersistence.getObjectByAddress(protocol, address);
 
-            if (affectedObjects.isEmpty()) { //there isn't an object with this protocol and address
+            if (objDao.findByAddress(protocol, address) != null) { //there isn't an object with this protocol and address
 
                 if ((clazz != null) && !clazz.isEmpty()) {
-                    EnvObjectLogic joined = environmentPersistence.join(clazz, name, protocol, address);
-                    affectedObjects.add(joined);
+                    //REGRESSION: EnvObjectLogic joined = envObjDao.join(clazz, name, protocol, address);
+                    //REGRESSION: affectedObjects.add(joined);
                 }
             }
         }
@@ -162,8 +162,8 @@ public final class TriggerCheck {
                 done = true;
 
                 long elapsedTime = System.currentTimeMillis() - event.getCreation();
-                LOG.log(Level.INFO, 
-                        "Sensor notification ''{0}'' applied to object ''{1}'' in {2}ms.", 
+                LOG.log(Level.INFO,
+                        "Sensor notification ''{0}'' applied to object ''{1}'' in {2}ms.",
                         new Object[]{resolved.getName(), object.getPojo().getName(), elapsedTime});
             }
         }
@@ -190,7 +190,7 @@ public final class TriggerCheck {
                     //found a related reaction. This must be executed
                     if (trigger.equals(reactionTrigger) && !reaction.getCommands().isEmpty()) {
                         if (!checkAdditionalConditions(reaction)) {
-                            LOG.log(Level.INFO, 
+                            LOG.log(Level.INFO,
                                     "Additional conditions test failed in reaction {0}", reaction.toString());
                             return;
                         }
@@ -220,8 +220,8 @@ public final class TriggerCheck {
                                     BehaviorManager.parseCommand(resolvedCommand);
                                 } else {
                                     //if the event has a target object we include also object info
-                                    EnvObjectLogic targetObject =
-                                            EnvObjectPersistence.getObjectByName(event.getProperty("object.name"));
+                                    EnvObjectLogic targetObject
+                                            = objDao.findByName(event.getProperty("object.name"));
 
                                     if (targetObject != null) {
                                         commandResolver.addContext("current.",
@@ -236,8 +236,8 @@ public final class TriggerCheck {
                                     Command reply = busService.send(resolvedCommand); //blocking wait until executed
 
                                     if (reply == null) {
-                                        LOG.log(Level.WARNING, 
-                                                "Unreceived reply within given time ({0}ms) for command {1}", 
+                                        LOG.log(Level.WARNING,
+                                                "Unreceived reply within given time ({0}ms) for command {1}",
                                                 new Object[]{command.getReplyTimeout(), command.getName()});
                                     } else {
                                         if (reply.isExecuted()) {
@@ -255,8 +255,8 @@ public final class TriggerCheck {
                             return;
                         }
 
-                        String info =
-                                "Executing automation '" + reaction.toString() + "' takes "
+                        String info
+                                = "Executing automation '" + reaction.toString() + "' takes "
                                 + (System.currentTimeMillis() - event.getCreation()) + "ms.";
                         LOG.info(info);
 
@@ -282,7 +282,7 @@ public final class TriggerCheck {
                 boolean result = true;
                 for (Condition condition : rea.getConditions()) {
                     //System.out.println("DEBUG: check condition " + condition.getTarget());
-                    EnvObjectLogic object = EnvObjectPersistence.getObjectByName(condition.getTarget());
+                    EnvObjectLogic object = objDao.findByName(condition.getTarget());
                     Statement statement = condition.getStatement();
                     if (object != null) {
                         BehaviorLogic behavior = object.getBehavior(statement.getAttribute());
@@ -307,5 +307,4 @@ public final class TriggerCheck {
 
         EXECUTOR.execute(automation);
     }
-    private static final Logger LOG = Logger.getLogger(TriggerCheck.class.getName());
 }

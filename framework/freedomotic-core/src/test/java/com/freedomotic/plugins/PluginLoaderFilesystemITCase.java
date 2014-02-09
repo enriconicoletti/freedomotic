@@ -6,7 +6,6 @@ package com.freedomotic.plugins;
 
 import com.freedomotic.api.Client;
 import com.freedomotic.plugins.filesystem.PluginsManager;
-import com.freedomotic.testutils.FreedomoticTestsInjector;
 import com.freedomotic.testutils.GuiceJUnitRunner;
 import com.freedomotic.testutils.GuiceJUnitRunner.GuiceInjectors;
 import com.google.inject.Inject;
@@ -23,7 +22,7 @@ import org.junit.runner.RunWith;
  * @author enrico
  */
 @RunWith(GuiceJUnitRunner.class)
-@GuiceInjectors({FreedomoticTestsInjector.class})
+//@GuiceInjectors({FreedomoticTestsInjector.class})
 public class PluginLoaderFilesystemITCase {
 
     //saves the loaded plugins in memory

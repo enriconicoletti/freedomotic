@@ -11,24 +11,24 @@ import java.util.Collection;
 // Interface that all EnvironmentDAOs must support
 public interface EnvironmentDao {
 
-    public void init() throws DaoLayerException;
+    void init() throws DaoLayerException;
 
-    public void close() throws DaoLayerException;
+    void close() throws DaoLayerException;
 
-    public void flush() throws DaoLayerException;
+    void flush() throws DaoLayerException;
 
-    public EnvironmentLogic insert(EnvironmentLogic environment);
+    boolean delete(EnvironmentLogic environment);
 
-    public boolean delete(EnvironmentLogic environment);
+    boolean update(EnvironmentLogic environment);
 
-    public EnvironmentLogic findByName(String name);
+    EnvironmentLogic insert(EnvironmentLogic environment);
 
-    public EnvironmentLogic findByUuid(String id);
+    EnvironmentLogic findByName(String name);
 
-    public EnvironmentLogic findDefaultEnvironment();
+    EnvironmentLogic findByUuid(String id);
 
-    public Collection<EnvironmentLogic> findAll();
+    EnvironmentLogic findDefault();
 
-    public boolean update(EnvironmentLogic environment);
+    Collection<EnvironmentLogic> findAll();
 
 }

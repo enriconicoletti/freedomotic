@@ -27,8 +27,7 @@ package com.freedomotic.core;
 
 import com.freedomotic.bus.BusConsumer;
 import com.freedomotic.bus.BusMessagesListener;
-import com.freedomotic.environment.EnvironmentPersistence;
-import com.freedomotic.objects.EnvObjectPersistence;
+import com.freedomotic.dao.EnvironmentDao;
 import com.freedomotic.reactions.Command;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -42,34 +41,32 @@ import javax.jms.ObjectMessage;
  * @author enrico
  */
 @Singleton
-public final class JoinDevice
-        implements BusConsumer {
+public final class JoinDevice implements BusConsumer {
 
-	private static final String MESSAGING_CHANNEL ="app.objects.create";
-	
-	private static BusMessagesListener listener;
-
-    //dependencies
-    private final EnvironmentPersistence environmentPersistence;
-
-    @Inject
-    private JoinDevice(EnvironmentPersistence environmentPersistence) {
-        this.environmentPersistence = environmentPersistence;
-        register();
-    }
+    private static final String MESSAGING_CHANNEL ="app.objects.create";
+    private static BusMessagesListener listener;
+    private static final Logger LOG = Logger.getLogger(JoinDevice.class.getName());
 
     static String getMessagingChannel() {
         return MESSAGING_CHANNEL;
     }
 
+    //dependencies
+    private final EnvironmentDao environment;
+
+    @Inject
+    private JoinDevice(EnvironmentDao environment) {
+        this.environment= environment;
+        register();
+    }
+
     /**
      * Register one or more channels to listen to
      */
-	private void register() {
-		listener = new BusMessagesListener(this);
-		listener.consumeCommandFrom(getMessagingChannel());
-	}
-
+    private void register() {
+        listener = new BusMessagesListener(this);
+        listener.consumeCommandFrom(getMessagingChannel());
+    }
     @Override
     public void onMessage(ObjectMessage message) {
         try {
@@ -82,13 +79,12 @@ public final class JoinDevice
                 String address = command.getProperty("object.address");
                 String clazz = command.getProperty("object.class");
 
-                if (EnvObjectPersistence.getObjectByAddress(protocol, address).isEmpty()) {
-                    environmentPersistence.join(clazz, name, protocol, address);
-                }
+                //REGRESSION: if (EnvObjectPersistence.getObjectByAddress(protocol, address).isEmpty()) {
+                    //REGRESSION: environment.join(clazz, name, protocol, address);
+                //REGRESSION: }
             }
         } catch (JMSException ex) {
             Logger.getLogger(JoinDevice.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    private static final Logger LOG = Logger.getLogger(JoinDevice.class.getName());
 }

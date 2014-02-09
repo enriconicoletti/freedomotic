@@ -23,10 +23,10 @@ import com.freedomotic.app.Freedomotic;
 import com.freedomotic.bus.BusConsumer;
 import com.freedomotic.bus.BusMessagesListener;
 import com.freedomotic.bus.BusService;
+import com.freedomotic.dao.EnvObjectDao;
 import com.freedomotic.model.object.EnvObject;
 import com.freedomotic.objects.BehaviorLogic;
 import com.freedomotic.objects.EnvObjectLogic;
-import com.freedomotic.objects.EnvObjectPersistence;
 import com.freedomotic.reactions.Command;
 import java.util.Collection;
 import java.util.HashSet;
@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.inject.Inject;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
@@ -53,85 +54,23 @@ import javax.jms.ObjectMessage;
  *
  * @author Enrico
  */
-public final class BehaviorManager
-        implements BusConsumer {
+public final class BehaviorManager implements BusConsumer {
 
     private static final Logger LOG = Logger.getLogger(BehaviorManager.class.getName());
     private static final String MESSAGING_CHANNEL = "app.events.sensors.behavior.request.objects";
 
-    /**
-     *
-     */
     public static final String PROPERTY_BEHAVIOR = "behavior";
-
-    /**
-     *
-     */
     public static final String PROPERTY_OBJECT_CLASS = "object.class";
-
-    /**
-     *
-     */
     public static final String PROPERTY_OBJECT_ADDRESS = "object.address";
-
-    /**
-     *
-     */
     public static final String PROPERTY_OBJECT_NAME = "object.name";
-
-    /**
-     *
-     */
     public static final String PROPERTY_OBJECT_PROTOCOL = "object.protocol";
-
-    /**
-     *
-     */
     public static final String PROPERTY_OBJECT = "object";
     private static BusMessagesListener listener;
-    private BusService busService;
+    @Inject
+    private static EnvObjectDao objDao;
 
     static String getMessagingChannel() {
         return MESSAGING_CHANNEL;
-    }
-
-    /**
-     *
-     */
-    public BehaviorManager() {
-        this.busService = Freedomotic.INJECTOR.getInstance(BusService.class);
-        register();
-    }
-
-    /**
-     * Register one or more channels to listen to
-     */
-    private void register() {
-        listener = new BusMessagesListener(this);
-        listener.consumeCommandFrom(getMessagingChannel());
-    }
-
-    @Override
-    public final void onMessage(final ObjectMessage message) {
-
-        // TODO LCG Boiler plate code, move this idiom to an abstract superclass.
-        Object jmsObject = null;
-        try {
-            jmsObject = message.getObject();
-        } catch (JMSException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-        }
-
-        if (jmsObject instanceof Command) {
-
-            Command command = (Command) jmsObject;
-
-            parseCommand(command);
-
-            // reply to the command to notify that is received it can be
-            // something like "turn on light 1"
-            sendReply(message, command);
-        }
     }
 
     private static void applyToCategory(Command userLevelCommand) {
@@ -145,8 +84,7 @@ public final class BehaviorManager
             Pattern pattern = Pattern.compile(regex);
 
             // TODO this should be in the collection
-            final Collection<EnvObjectLogic> objectList = EnvObjectPersistence
-                    .getObjectList();
+            final Collection<EnvObjectLogic> objectList = objDao.findAll();
 
             for (EnvObjectLogic object : objectList) {
 
@@ -186,7 +124,7 @@ public final class BehaviorManager
             Set<String> testSet = new HashSet<String>();
             Set<String> extestSet = new HashSet<String>();
 
-            for (EnvObjectLogic object : EnvObjectPersistence.getObjectList()) {
+            for (EnvObjectLogic object : objDao.findAll()) {
                 final EnvObject pojo = object.getPojo();
                 boolean apply;
                 testSet.clear();
@@ -220,8 +158,7 @@ public final class BehaviorManager
 
         // gets a reference to an EnvObject using the key 'object' in the user
         // level command
-        EnvObjectLogic obj = EnvObjectPersistence
-                .getObjectByName(userLevelCommand.getProperty(Command.PROPERTY_OBJECT));
+        EnvObjectLogic obj = objDao.findByName(userLevelCommand.getProperty(Command.PROPERTY_OBJECT));
 
         // if the object exists
         if (obj != null) {
@@ -232,10 +169,10 @@ public final class BehaviorManager
 
             // if this behavior exists in object obj
             if (behavior != null) {
-
+                
                 LOG.log(Level.CONFIG, 
                         "User level command ''{0}'' request changing behavior {1} of object ''{2}'' "
-                        + "from value ''{3}'' to value ''{4}''", 
+                                + "from value ''{3}'' to value ''{4}''", 
                         new Object[]{userLevelCommand.getName(), behavior.getName(), obj.getPojo().getName(), behavior.getValueAsString(), userLevelCommand.getProperties().getProperty("value")});
 
                 // true means a command must be fired
@@ -244,7 +181,7 @@ public final class BehaviorManager
             } else {
                 LOG.log(Level.WARNING, 
                         "Behavior ''{0}'' is not a valid behavior for object ''{1}''. "
-                        + "Please check ''behavior'' parameter spelling in command {2}", 
+                                + "Please check ''behavior'' parameter spelling in command {2}", 
                         new Object[]{behaviorName, obj.getPojo().getName(), userLevelCommand.getName()});
             }
         } else {
@@ -259,38 +196,78 @@ public final class BehaviorManager
      *
      * @param userLevelCommand
      */
-    protected static void parseCommand(Command userLevelCommand) {
-
-        String object = userLevelCommand.getProperty(Command.PROPERTY_OBJECT);
-        String objectClass = userLevelCommand.getProperty(Command.PROPERTY_OBJECT_CLASS);
-        String objectincludeTags = userLevelCommand.getProperty(Command.PROPERTY_OBJECT_INCLUDETAGS);
-        String objectexcludeTags = userLevelCommand.getProperty(Command.PROPERTY_OBJECT_EXCLUDETAGS);
-        String behavior = userLevelCommand.getProperty(Command.PROPERTY_BEHAVIOR);
-
-        if (behavior != null) {
-
-            if (object != null) {
-                /*
-                 * if we have the object name and the behavior it means the
-                 * behavior must be applied only to the given object name.
-                 */
-                applyToSingleObject(userLevelCommand);
-            } else {
-
-                if (objectClass != null || objectincludeTags != null || objectexcludeTags != null) {
-                    try {
-                        /*
-                         * if we have the category and the behavior (and not the
-                         * object name) it means the behavior must be applied to all
-                         * object belonging to the given category. eg: all lights on
-                         */
-                        Command clonedOne = userLevelCommand.clone();
-                        applyToCategory(clonedOne);
-                    } catch (CloneNotSupportedException ex) {
-                        Logger.getLogger(BehaviorManager.class.getName()).log(Level.SEVERE, null, ex);
+        protected static void parseCommand(Command userLevelCommand) {
+            
+            String object = userLevelCommand.getProperty(Command.PROPERTY_OBJECT);
+            String objectClass = userLevelCommand.getProperty(Command.PROPERTY_OBJECT_CLASS);
+            String objectincludeTags = userLevelCommand.getProperty(Command.PROPERTY_OBJECT_INCLUDETAGS);
+            String objectexcludeTags = userLevelCommand.getProperty(Command.PROPERTY_OBJECT_EXCLUDETAGS);
+            String behavior = userLevelCommand.getProperty(Command.PROPERTY_BEHAVIOR);
+            
+            if (behavior != null) {
+                
+                if (object != null) {
+                    /*
+                    * if we have the object name and the behavior it means the
+                    * behavior must be applied only to the given object name.
+                    */
+                    applyToSingleObject(userLevelCommand);
+                } else {
+                    
+                    if (objectClass != null || objectincludeTags != null || objectexcludeTags != null) {
+                        try {
+                            /*
+                            * if we have the category and the behavior (and not the
+                            * object name) it means the behavior must be applied to all
+                            * object belonging to the given category. eg: all lights on
+                            */
+                            Command clonedOne = userLevelCommand.clone();
+                            applyToCategory(clonedOne);
+                        } catch (CloneNotSupportedException ex) {
+                            Logger.getLogger(BehaviorManager.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 }
             }
+        }
+    private final BusService busService;
+
+    /**
+     *
+     */
+    public BehaviorManager() {
+        this.busService = Freedomotic.INJECTOR.getInstance(BusService.class);
+        register();
+    }
+
+    /**
+     * Register one or more channels to listen to
+     */
+    private void register() {
+        listener = new BusMessagesListener(this);
+        listener.consumeCommandFrom(getMessagingChannel());
+    }
+
+    @Override
+    public final void onMessage(final ObjectMessage message) {
+        
+        // TODO LCG Boiler plate code, move this idiom to an abstract superclass.
+        Object jmsObject = null;
+        try {
+            jmsObject = message.getObject();
+        } catch (JMSException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        }
+        
+        if (jmsObject instanceof Command) {
+            
+            Command command = (Command) jmsObject;
+            
+            parseCommand(command);
+            
+            // reply to the command to notify that is received it can be
+            // something like "turn on light 1"
+            sendReply(message, command);
         }
     }
 

@@ -157,7 +157,7 @@ public abstract class Protocol
                 }
             };
 
-            getApi().getAuth().pluginExecutePrivileged(this, action);
+            //REGRESSION:getApi().getAuth().pluginExecutePrivileged(this, action);
         }
     }
 
@@ -178,7 +178,7 @@ public abstract class Protocol
                     busService.send(event);
                 }
             };
-            getApi().getAuth().pluginExecutePrivileged(this, action);
+            //REGRESSION: getApi().getAuth().pluginExecutePrivileged(this, action);
         }
     }
 

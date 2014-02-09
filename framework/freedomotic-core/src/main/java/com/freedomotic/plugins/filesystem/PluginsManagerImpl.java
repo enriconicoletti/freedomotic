@@ -114,7 +114,7 @@ public class PluginsManagerImpl implements PluginsManager {
                 Plugin p = (Plugin) client;
                 p.loadPermissionsFromManifest();
                 if (p.getConfiguration().getBooleanProperty("enable-i18n", false)) {
-                    p.getApi().getI18n().registerPluginBundleDir(p);
+                    //REGRESSION: p.getApi().getI18n().registerPluginBundleDir(p);
                 }
             }
             clientStorage.add(client);

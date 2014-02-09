@@ -1,7 +1,7 @@
 package com.freedomotic.dao.xml;
 
 import com.freedomotic.dao.EnvObjectDao;
-import com.freedomotic.environment.EnvironmentPersistence;
+import com.freedomotic.dao.EnvironmentDao;
 import com.freedomotic.exceptions.DaoLayerException;
 import com.freedomotic.model.object.EnvObject;
 import com.freedomotic.objects.EnvObjectFactory;
@@ -32,7 +32,8 @@ import javax.inject.Inject;
  * Created with IntelliJ IDEA. User: nicoletti Date: 8/11/13 Time: 2:03 PM To
  * change this template use File | Settings | File Templates.
  */
-class XmlEnvObjectDao implements EnvObjectDao {
+//REGRESSION: should be package private
+public class XmlEnvObjectDao implements EnvObjectDao {
 
     private static final Logger LOG = Logger.getLogger(XmlEnvObjectDao.class.getName());
     //contains the loaded objects indexed using the object name as the key
@@ -41,6 +42,9 @@ class XmlEnvObjectDao implements EnvObjectDao {
     private static boolean alreadyInitialized;
     //the filesystem path from which to load objects xml files
     private File folder;
+    //environment DAO link
+    //@Inject
+    //EnvironmentDao envDao;
 
     @Inject
     public XmlEnvObjectDao() throws DaoLayerException {
@@ -278,11 +282,11 @@ class XmlEnvObjectDao implements EnvObjectDao {
                     obj.getPojo().setUUID(UUID.randomUUID().toString());
                 }
 
-                if ((obj.getPojo().getEnvironmentID() == null)
-                        || obj.getPojo().getEnvironmentID().isEmpty()) {
-                    obj.getPojo()
-                            .setEnvironmentID(EnvironmentPersistence.getEnvironments().get(0).getPojo().getUUID());
-                }
+                //REGRESSION: if ((obj.getPojo().getEnvironmentID() == null)
+                //        || obj.getPojo().getEnvironmentID().isEmpty()) {
+                //    obj.getPojo()
+                //            .setEnvironmentID(envDao.findDefault().getUUID());
+                //}
 
                 String fileName = obj.getPojo().getUUID() + ".xobj";
                 BufferedWriter out = new BufferedWriter(new FileWriter(folder + "/" + fileName));

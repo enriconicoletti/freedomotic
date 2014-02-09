@@ -22,8 +22,8 @@ package com.freedomotic.objects;
 import com.freedomotic.app.Freedomotic;
 import com.freedomotic.bus.BusService;
 import com.freedomotic.core.Resolver;
+import com.freedomotic.dao.EnvironmentDao;
 import com.freedomotic.environment.EnvironmentLogic;
-import com.freedomotic.environment.EnvironmentPersistence;
 import com.freedomotic.environment.ZoneLogic;
 import com.freedomotic.events.ObjectHasChangedBehavior;
 import com.freedomotic.exceptions.VariableResolutionException;
@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 /**
@@ -64,6 +65,8 @@ public class EnvObjectLogic {
     private HashMap<String, Command> commandsMapping; //mapping between action name -> hardware command instance
     private HashMap<String, BehaviorLogic> behaviors = new HashMap<String, BehaviorLogic>();
     private EnvironmentLogic environment;
+    @Inject
+    EnvironmentDao envDao;
 
     /**
      *
@@ -374,10 +377,10 @@ public class EnvObjectLogic {
     public final void setRandomLocation() {
         int randomX
                 = 0
-                + (int) (Math.random() * EnvironmentPersistence.getEnvironments().get(0).getPojo().getWidth());
+                + (int) (Math.random() * envDao.findDefault().getWidth());
         int randomY
                 = 0
-                + (int) (Math.random() * EnvironmentPersistence.getEnvironments().get(0).getPojo().getHeight());
+                + (int) (Math.random() * envDao.findDefault().getHeight());
         setLocation(randomX, randomY);
     }
 
@@ -405,7 +408,7 @@ public class EnvObjectLogic {
         FreedomPolygon translatedObject
                 = (FreedomPolygon) TopologyUtils.translate((FreedomPolygon) shape, xoffset, yoffset);
 
-        for (EnvironmentLogic locEnv : EnvironmentPersistence.getEnvironments()) {
+        for (EnvironmentLogic locEnv : envDao.findAll()) {
             for (ZoneLogic zone : locEnv.getZones()) {
                 //remove from every zone
                 zone.getPojo().getObjects().remove(this.getPojo());
@@ -552,12 +555,12 @@ public class EnvObjectLogic {
     @RequiresPermissions("objects:update")
     protected void setPojo(EnvObject pojo) {
         if (((pojo.getEnvironmentID() == null) || pojo.getEnvironmentID().isEmpty())
-                && (EnvironmentPersistence.getEnvironments().size() > 0)) {
-            pojo.setEnvironmentID(EnvironmentPersistence.getEnvironments().get(0).getPojo().getUUID());
+                && (envDao.findAll().size() > 0)) {
+            pojo.setEnvironmentID(envDao.findDefault().getUUID());
         }
 
         this.pojo = pojo;
-        this.environment = EnvironmentPersistence.getEnvByUUID(pojo.getEnvironmentID());
+        this.environment = envDao.findByUuid(pojo.getEnvironmentID());
     }
 
     @RequiresPermissions({"objects:update", "triggers:update"})

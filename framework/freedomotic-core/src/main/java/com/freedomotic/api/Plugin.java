@@ -37,69 +37,28 @@ import javax.swing.JFrame;
  *
  * @author nicoletti
  */
-public class Plugin
-        implements Client {
-//    private boolean isConnected = false;
-
-    /**
-     *
-     */
-    
-    protected volatile boolean isRunning;
-    private String pluginName;
-    private String type = "Plugin";
-
-    /**
-     *
-     */
-    public Config configuration;
-
-    /**
-     *
-     */
-    protected JFrame gui;
-    // private static final String SEPARATOR = "-";
-    //config file parameters
-
-    /**
-     *
-     */
-        protected String description;
-
-    /**
-     *
-     */
-    protected String version;
-
-    /**
-     *
-     */
-    protected String requiredVersion;
-
-    /**
-     *
-     */
-    protected String category;
-
-    /**
-     *
-     */
-    protected String shortName;
-
-    /**
-     *
-     */
-    protected String listenOn;
-
-    /**
-     *
-     */
-    protected String sendOn;
-    private File path;
+public class Plugin implements Client {
     final static int SAME_VERSION = 0;
     final static int FIRST_IS_OLDER = -1;
     final static int LAST_IS_OLDER = 1;
+    private static final Logger LOG = Logger.getLogger(Plugin.class.getName());
+
+    protected volatile boolean isRunning;
+    private String pluginName;
+    private String type = "Plugin";
+    public Config configuration;
+    protected JFrame gui;
+    protected String description;
+    protected String version;
+    protected String requiredVersion;
+    protected String category;
+    protected String shortName;
+    protected String listenOn;
+    protected String sendOn;
+    private File path;
     private BusService busService;
+    @Inject
+    private API api;
 
     /**
      *
@@ -108,6 +67,7 @@ public class Plugin
      */
     public Plugin(String pluginName, String manifestPath) {
         this(pluginName);
+        //TODO: change it
         path = new File(Info.getDevicesPath() + manifestPath);
         init(path);
     }
@@ -312,13 +272,12 @@ public class Plugin
 //    public void setConnected() {
 //        isConnected = true;
 //    }
-
     /**
      *
      * @param aThat
      * @return
      */
-        @Override
+    @Override
     public boolean equals(Object aThat) {
         //check for self-comparison
         if (this == aThat) {
@@ -336,7 +295,6 @@ public class Plugin
 
         //Alternative to the above line :
         //if ( aThat == null || aThat.getClass() != this.getClass() ) return false;
-
         //cast to native object is now safe
         Plugin that = (Plugin) aThat;
 
@@ -416,11 +374,14 @@ public class Plugin
         return getName();
     }
 
+    public API getApi() {
+        return this.api;
+    }
+
     /**
      *
      */
     public void loadPermissionsFromManifest() {
-        //REGRESSION: getApi().getAuth().setPluginPrivileges(this, configuration.getStringProperty("permissions", getApi().getAuth().getPluginDefaultPermission()));
+        getApi().getAuth().setPluginPrivileges(this, configuration.getStringProperty("permissions", getApi().getAuth().getPluginDefaultPermission()));
     }
-    private static final Logger LOG = Logger.getLogger(Plugin.class.getName());
 }

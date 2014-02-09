@@ -157,7 +157,7 @@ public abstract class Protocol
                 }
             };
 
-            //REGRESSION:getApi().getAuth().pluginExecutePrivileged(this, action);
+            getApi().getAuth().pluginExecutePrivileged(this, action);
         }
     }
 

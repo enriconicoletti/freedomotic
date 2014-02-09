@@ -9,7 +9,6 @@ import com.freedomotic.environment.ZoneLogic;
 import com.freedomotic.events.ObjectReceiveClick;
 import com.freedomotic.model.geometry.FreedomPoint;
 import com.freedomotic.objects.EnvObjectLogic;
-import com.freedomotic.objects.EnvObjectPersistence;
 import com.freedomotic.util.TopologyUtils;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -22,18 +21,18 @@ import java.util.Queue;
  *
  * @author enrico
  */
-public class PlainDrawer
-        extends Renderer {
+public class PlainDrawer extends Renderer {
 
-    private Color PERIMETRAL_WALLS_COLOR = Color.black;
-    private Color PERIMETRAL_WALLS_COLOR_DARK = Color.black;
-    private Color PERIMETRAL_WALLS_COLOR_LIGHT = Color.black;
-    private Color INTERNAL_WALLS_COLOR = Color.black;
-    private Color INTERNAL_WALLS_COLOR_DARK = Color.black;
-    private int PERIMETRAL_WALLS_TICKNESS = 15;
-    private int INTERNAL_WALLS_TICKNESS = 3;
-    private int ENVIRONMENT_SHADOW_OFFSET = 10;
-    private Color ENVIRONMENT_SHADOW_COLOR = backgroundColor.darker();
+    private final Color PERIMETRAL_WALLS_COLOR = Color.black;
+    private final Color PERIMETRAL_WALLS_COLOR_DARK = Color.black;
+    private final Color PERIMETRAL_WALLS_COLOR_LIGHT = Color.black;
+    private final Color INTERNAL_WALLS_COLOR = Color.black;
+    private final Color INTERNAL_WALLS_COLOR_DARK = Color.black;
+    private final int PERIMETRAL_WALLS_TICKNESS = 15;
+    private final int INTERNAL_WALLS_TICKNESS = 3;
+    private final int ENVIRONMENT_SHADOW_OFFSET = 10;
+    private final Color ENVIRONMENT_SHADOW_COLOR = backgroundColor.darker();
+    private final JavaDesktopFrontend master;
 
     /**
      *
@@ -41,6 +40,7 @@ public class PlainDrawer
      */
     public PlainDrawer(JavaDesktopFrontend master) {
         super(master);
+        this.master = master;
     }
 
     /**
@@ -120,7 +120,7 @@ public class PlainDrawer
      */
     @Override
     public void renderObjects() {
-        for (EnvObjectLogic obj : EnvObjectPersistence.getObjectByEnvironment(getCurrEnv().getPojo().getUUID())) {
+        for (EnvObjectLogic obj : master.getApi().getObjectByEnvironment(getCurrEnv().getUUID())) {
             if (obj != null) {
                 setTransformContextFor(obj.getPojo());
                 drawPlainObject(obj);

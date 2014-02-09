@@ -25,7 +25,6 @@ package com.freedomotic.plugins;
 
 import com.freedomotic.api.Client;
 import com.freedomotic.dao.EnvObjectDao;
-import com.freedomotic.dao.xml.XmlEnvObjectDao;
 import com.freedomotic.environment.EnvironmentLogic;
 import com.freedomotic.exceptions.DaoLayerException;
 import com.freedomotic.model.ds.Config;
@@ -51,8 +50,6 @@ public class ObjectPluginPlaceholder implements Client {
     private final File example;
     private final EnvObjectLogic object;
     private final Config config;
-    @Inject
-    private EnvObjectDao objDao;
 
     private static final Logger LOG = Logger.getLogger(ObjectPluginPlaceholder.class.getName());
 
@@ -125,7 +122,7 @@ public class ObjectPluginPlaceholder implements Client {
      */
     @Override
     public void start() {
-        objDao.insert(object);
+        //objDao.insert(object);
     }
 
     /**
@@ -191,8 +188,7 @@ public class ObjectPluginPlaceholder implements Client {
         if (env == null) {
             throw new IllegalArgumentException("Cannot place an object on a null environment");
         }
-        EnvObjectLogic obj = objDao.insert(object);
-        obj.setEnvironment(env);
+        object.setEnvironment(env);
     }
 
     /**
@@ -216,6 +212,9 @@ public class ObjectPluginPlaceholder implements Client {
 
             try {
                 objectLogic = EnvObjectFactory.create(pojo);
+                if (objectLogic == null) {
+                    throw new IllegalStateException("EnvObject logic cannot be null at this stage");
+                }
                 LOG.config("Created a new logic for " + objectLogic.getPojo().getName()
                         + " of type " + objectLogic.getClass().getCanonicalName().toString());
 

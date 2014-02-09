@@ -5,7 +5,6 @@
 package com.freedomotic.jfrontend;
 
 import com.freedomotic.environment.EnvironmentLogic;
-import com.freedomotic.environment.EnvironmentPersistence;
 import com.freedomotic.environment.Room;
 import com.freedomotic.environment.ZoneLogic;
 import javax.swing.JPanel;
@@ -14,8 +13,7 @@ import javax.swing.JPanel;
  *
  * @author enrico
  */
-public abstract class Drawer
-        extends JPanel {
+public abstract class Drawer extends JPanel {
 
     /**
      *
@@ -53,14 +51,6 @@ public abstract class Drawer
     boolean getObjectEditMode() {
         //throw new UnsupportedOperationException("Not yet implemented");
         return false;
-    }
-
-    void setCurrEnv(String uuid) {
-        setCurrEnv(EnvironmentPersistence.getEnvByUUID(uuid));
-    }
-
-    void setCurrEnv(int id) {
-        setCurrEnv(EnvironmentPersistence.getEnvironments().get(id));
     }
 
     abstract EnvironmentLogic getCurrEnv();

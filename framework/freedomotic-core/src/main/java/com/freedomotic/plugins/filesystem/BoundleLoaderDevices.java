@@ -61,7 +61,9 @@ class BoundleLoaderDevices implements BoundleLoader {
                                     || (superclass.getName().equals("com.freedomotic.api.Intelligence"))
                                     || (superclass.getName().equals("com.freedomotic.api.Tool"))) {
                                 try {
-                                    plugin = (Plugin) Freedomotic.INJECTOR.getInstance(clazz);
+                                    //plugin = (Plugin) Freedomotic.INJECTOR.getInstance(clazz);
+                                    plugin = (Plugin) clazz.newInstance();
+                                    //Freedomotic.INJECTOR.injectMembers(plugin);
                                     results.add(plugin);
                                 //} catch (InstantiationException ex) {
                                 //    throw new PluginLoadingException("Cannot instantiate plugin "

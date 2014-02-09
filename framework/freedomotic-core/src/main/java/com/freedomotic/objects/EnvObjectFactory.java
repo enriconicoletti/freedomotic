@@ -36,11 +36,6 @@ import java.util.List;
  */
 public final class EnvObjectFactory {
 
-    private EnvObjectFactory() {
-        // Suppress default constructor for noninstantiability
-        throw new AssertionError();
-    }
-
     /**
      * Instantiate the right logic manager for an object pojo using the pojo
      * "type" field
@@ -49,8 +44,7 @@ public final class EnvObjectFactory {
      * @return
      * @throws com.freedomotic.exceptions.DaoLayerException
      */
-    public static EnvObjectLogic create(EnvObject pojo)
-            throws DaoLayerException {
+    public static EnvObjectLogic create(EnvObject pojo) throws DaoLayerException {
         if (pojo == null) {
             throw new IllegalArgumentException("Cannot create an object logic from null object data");
         }
@@ -60,6 +54,14 @@ public final class EnvObjectFactory {
             Class<?> clazz = classLoader.loadClass(pojo.getHierarchy()); //eg: com.freedomotic.objects.impl.ElectricDevice
 
             EnvObjectLogic logic = (EnvObjectLogic) Freedomotic.INJECTOR.getInstance(clazz);
+//            EnvObjectLogic logic = null;
+//            try {
+//                logic = (EnvObjectLogic) clazz.newInstance();
+//            } catch (InstantiationException ex) {
+//                Logger.getLogger(EnvObjectFactory.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (IllegalAccessException ex) {
+//                Logger.getLogger(EnvObjectFactory.class.getName()).log(Level.SEVERE, null, ex);
+//            }
             logic.setPojo(pojo);
 
             return logic;
@@ -81,7 +83,8 @@ public final class EnvObjectFactory {
      * @return A generic object which can be customized later
      * @throws com.freedomotic.exceptions.DaoLayerException
      */
-    public static EnvObjectLogic createDummy() throws DaoLayerException {
+    public static EnvObjectLogic createDummy()
+            throws DaoLayerException {
         EnvObject data = new EnvObject();
         data.setName("A basic EnvObject");
         data.setPhisicalAddress("unknown");
@@ -103,5 +106,10 @@ public final class EnvObjectFactory {
         data.setEnvironmentID("df28cda0-a866-11e2-9e96-0800200c9a66");
         EnvObjectLogic logic = create(data);
         return logic;
+    }
+
+    private EnvObjectFactory() {
+        // Suppress default constructor for noninstantiability
+        throw new AssertionError();
     }
 }

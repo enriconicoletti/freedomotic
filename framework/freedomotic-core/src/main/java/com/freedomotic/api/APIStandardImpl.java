@@ -179,6 +179,15 @@ public class APIStandardImpl
     public Collection<EnvironmentLogic> getEnvironments() {
         return environment.findAll();
     }
+    
+        /**
+     *
+     * @return
+     */
+    @Override
+    public EnvironmentLogic getDefaultEnvironments() {
+        return environment.findDefault();
+    }
 
     /**
      *

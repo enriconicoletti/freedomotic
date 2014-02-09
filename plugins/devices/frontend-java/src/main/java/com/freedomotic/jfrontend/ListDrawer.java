@@ -7,14 +7,12 @@ package com.freedomotic.jfrontend;
 import com.freedomotic.app.Freedomotic;
 import com.freedomotic.core.ResourcesManager;
 import com.freedomotic.environment.EnvironmentLogic;
-import com.freedomotic.environment.EnvironmentPersistence;
 import com.freedomotic.environment.ZoneLogic;
 import com.freedomotic.events.ObjectReceiveClick;
 import com.freedomotic.jfrontend.utils.SpringUtilities;
 import com.freedomotic.model.object.EnvObject;
 import com.freedomotic.objects.BehaviorLogic;
 import com.freedomotic.objects.EnvObjectLogic;
-import com.freedomotic.objects.EnvObjectPersistence;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -36,12 +34,12 @@ import javax.swing.SpringLayout;
  *
  * @author enrico
  */
-public class ListDrawer
-        extends Renderer {
+public class ListDrawer extends Renderer {
 
-    JComboBox cmbZone = new JComboBox();
-    JPanel panel = new JPanel();
-    EnvironmentLogic currEnv = EnvironmentPersistence.getEnvironments().get(0);
+    private JComboBox cmbZone;
+    private final JPanel panel = new JPanel();
+    private final JavaDesktopFrontend master;
+    private EnvironmentLogic currEnv;
 
     /**
      *
@@ -49,8 +47,12 @@ public class ListDrawer
      */
     public ListDrawer(JavaDesktopFrontend master) {
         super(master);
+        this.cmbZone = new JComboBox();
+        this.master=master;
+        currEnv = master.getApi().getDefaultEnvironments();
         cmbZone.removeAllItems();
         cmbZone.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 ZoneLogic zone = (ZoneLogic) cmbZone.getSelectedItem();
                 enlistObjects(zone);
@@ -103,7 +105,7 @@ public class ListDrawer
         }
 
         for (final EnvObject objPojo : zone.getPojo().getObjects()) {
-            final EnvObjectLogic obj = EnvObjectPersistence.getObjectByUUID(objPojo.getUUID());
+            final EnvObjectLogic obj = master.getApi().getObjectByUUID(objPojo.getUUID());
 
             //a coloumn with object name
             JLabel icon = new JLabel(renderSingleObject(obj.getPojo()));

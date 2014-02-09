@@ -9,7 +9,6 @@ import com.freedomotic.environment.ZoneLogic;
 import com.freedomotic.model.geometry.FreedomPoint;
 import com.freedomotic.objects.BehaviorLogic;
 import com.freedomotic.objects.EnvObjectLogic;
-import com.freedomotic.objects.EnvObjectPersistence;
 import com.freedomotic.util.TopologyUtils;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -23,6 +22,8 @@ import java.util.Queue;
  */
 public class ImageDrawer
         extends PlainDrawer {
+    
+    private JavaDesktopFrontend master;
 
     /**
      *
@@ -30,6 +31,7 @@ public class ImageDrawer
      */
     public ImageDrawer(JavaDesktopFrontend master) {
         super(master);
+        this.master=master;
     }
 
     /**
@@ -44,7 +46,7 @@ public class ImageDrawer
      */
     @Override
     public void renderObjects() {
-        for (EnvObjectLogic obj : EnvObjectPersistence.getObjectByEnvironment(getCurrEnv().getPojo().getUUID())) {
+        for (EnvObjectLogic obj : master.getApi().getObjectByEnvironment(getCurrEnv().getPojo().getUUID())) {
             renderSingleObject(obj);
         }
     }

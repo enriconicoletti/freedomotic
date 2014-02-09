@@ -2,7 +2,7 @@ package com.freedomotic.dao.xml;
 
 /**
  * Implementation of EnvironmentDao interface to read XML file from filesystem.
- * This class should be kept hidden outside  package
+ * This class should be kept hidden outside package
  */
 import com.freedomotic.dao.EnvironmentDao;
 import com.freedomotic.environment.EnvironmentLogic;
@@ -31,7 +31,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 
-
 //REGRESSION: should be package private
 public class XmlEnvironmentDao implements EnvironmentDao {
 
@@ -44,14 +43,10 @@ public class XmlEnvironmentDao implements EnvironmentDao {
     //the base filesystem folder in which all environments are saved as XML files (one env for each subfolder)
     private static final File FOLDER = new File(Info.PATH_WORKDIR + "/data/furn/");
     //flag for initialization
-    private static boolean alreadyInitialized;
+    private static boolean alreadyInitialized = false;
 
     @Inject
     public XmlEnvironmentDao() {
-        //clear previuous content, if any (this is shared through different class instances)
-        //and force reinitialization
-        environments.clear();
-        alreadyInitialized = false;
         try {
             init();
         } catch (DaoLayerException ex) {
@@ -61,7 +56,8 @@ public class XmlEnvironmentDao implements EnvironmentDao {
 
     /**
      * Initialize the filesystem DAO (XML files). Loads any environment XML into
-     * a Java data structure. DO NOT CALL IT, automatically managed in the constructor
+     * a Java data structure. DO NOT CALL IT, automatically managed in the
+     * constructor
      *
      * @throws DaoLayerException
      */
@@ -82,6 +78,9 @@ public class XmlEnvironmentDao implements EnvironmentDao {
             File[] dirs = FOLDER.listFiles(directoryFilter);
             for (File dir : dirs) {
                 if (dir.isDirectory()) {
+                            //clear previuous content, if any (this is shared through different class instances)
+                    //and force reinitialization
+                    environments.clear();
                     loadFromFilesystem(dir);
                 }
             }

@@ -76,9 +76,9 @@ public class PluginsManagerImpl implements PluginsManager {
     public void loadAllPlugins() throws PluginLoadingException {
         List<BoundleLoader> boundleLoaders = new ArrayList<BoundleLoader>();
         BoundleLoaderFactory boundleLoaderFactory = new BoundleLoaderFactory();
-        boundleLoaders.addAll(boundleLoaderFactory.getBoundleLoaders(TYPE_DEVICE));
-        boundleLoaders.addAll(boundleLoaderFactory.getBoundleLoaders(TYPE_OBJECT));
         boundleLoaders.addAll(boundleLoaderFactory.getBoundleLoaders(TYPE_EVENT));
+        boundleLoaders.addAll(boundleLoaderFactory.getBoundleLoaders(TYPE_OBJECT));
+        boundleLoaders.addAll(boundleLoaderFactory.getBoundleLoaders(TYPE_DEVICE));
 
         for (BoundleLoader boundleLoader : boundleLoaders) {
             loadSingleBundle(boundleLoader);
@@ -211,13 +211,13 @@ public class PluginsManagerImpl implements PluginsManager {
 
         if (templatesFolder.exists()) {
             //for every envobject class a placeholder is created
-            File[] templates =
-                    templatesFolder.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return (name.endsWith(".xobj"));
-                }
-            });
+            File[] templates
+                    = templatesFolder.listFiles(new FilenameFilter() {
+                        @Override
+                        public boolean accept(File dir, String name) {
+                            return (name.endsWith(".xobj"));
+                        }
+                    });
 
             for (File template : templates) {
                 Client placeholder;
@@ -305,9 +305,9 @@ public class PluginsManagerImpl implements PluginsManager {
                 packageFile.getProperty("package.nodeid"));
         client.getConfiguration()
                 .setProperty("framework.required.version",
-                packageFile.getProperty("framework.required.major") + "."
-                + packageFile.getProperty("framework.required.minor") + "."
-                + packageFile.getProperty("framework.required.build"));
+                        packageFile.getProperty("framework.required.major") + "."
+                        + packageFile.getProperty("framework.required.minor") + "."
+                        + packageFile.getProperty("framework.required.build"));
         client.getConfiguration().setProperty("framework.required.major",
                 packageFile.getProperty("framework.required.major"));
         client.getConfiguration().setProperty("framework.required.minor",

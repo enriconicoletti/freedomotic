@@ -1,7 +1,6 @@
 package com.freedomotic.dao.xml;
 
 import com.freedomotic.dao.EnvObjectDao;
-import com.freedomotic.dao.EnvironmentDao;
 import com.freedomotic.exceptions.DaoLayerException;
 import com.freedomotic.model.object.EnvObject;
 import com.freedomotic.objects.EnvObjectFactory;
@@ -37,45 +36,31 @@ public class XmlEnvObjectDao implements EnvObjectDao {
 
     private static final Logger LOG = Logger.getLogger(XmlEnvObjectDao.class.getName());
     //contains the loaded objects indexed using the object name as the key
-    private static Map<String, EnvObjectLogic> objects = new HashMap<String, EnvObjectLogic>();
+    private static final Map<String, EnvObjectLogic> objects = new HashMap<String, EnvObjectLogic>();
     //flag for initialization
-    private static boolean alreadyInitialized;
+    private static boolean alreadyInitialized = false;
     //the filesystem path from which to load objects xml files
-    private File folder;
-    //environment DAO link
-    //@Inject
-    //EnvironmentDao envDao;
+    private static final File FOLDER = new File(Info.PATH_WORKDIR + "/data/furn/default/data/obj");
 
     @Inject
-    public XmlEnvObjectDao() throws DaoLayerException {
-        //clear previuous content, if any (this is shared through different class instances)
-        //and force reinitialization
-        //this.folder = folder;
-        objects.clear();
-        alreadyInitialized = false;
-        //init();
+    public XmlEnvObjectDao() {
+        try {
+            init();
+        } catch (DaoLayerException ex) {
+            Logger.getLogger(XmlEnvironmentDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
-    public final void init() throws DaoLayerException {
+    public final synchronized void init() throws DaoLayerException {
         if (!alreadyInitialized) {
-            if (!folder.isDirectory()) {
-                throw new IllegalArgumentException("Expect this to be a directory not a file: " + folder);
+            if (!FOLDER.isDirectory()) {
+                throw new IllegalArgumentException("Expect this to be a directory not a file: " + FOLDER);
             }
-
-            FileFilter directoryFilter = new FileFilter() {
-                @Override
-                public boolean accept(File folder) {
-                    return folder.isDirectory();
-                }
-            };
-
-            File[] dirs = folder.listFiles(directoryFilter);
-            for (File dir : dirs) {
-                if (dir.isDirectory()) {
-                    loadFromFilesystem(dir);
-                }
-            }
+            //clear previuous content, if any (this is shared through different class instances)
+            //and force reinitialization
+            objects.clear();
+            loadFromFilesystem(FOLDER);
         }
         //set the initialized flag
         alreadyInitialized = true;
@@ -129,7 +114,7 @@ public class XmlEnvObjectDao implements EnvObjectDao {
         }
 
         if (!objects.containsKey(obj.getPojo().getName())) {
-            obj.init();
+            //REGRESSION: obj.init(); an object should be initialized only when inserted into environment
             objects.put(obj.getPojo().getName(), obj);
             obj.setChanged(true);
         } else {
@@ -235,13 +220,58 @@ public class XmlEnvObjectDao implements EnvObjectDao {
     }
 
     /**
+     * Loads all objects file filesystem folder and adds the objects to the list
+     *
+     * @param folder
+     * @throws com.freedomotic.exceptions.DaoLayerException
+     */
+    public void loadFromFilesystem(File folder) throws DaoLayerException {
+        LOG.info("DEBUG: loading objects from " + folder.getAbsolutePath());
+
+        // This filter only returns object files
+        FileFilter objectFileFilter
+                = new FileFilter() {
+                    @Override
+                    public boolean accept(File file) {
+                        if (file.isFile() && file.getName().endsWith(".xobj")) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                };
+
+        File[] files = folder.listFiles(objectFileFilter);
+
+        if (files != null) {
+            for (File file : files) {
+                EnvObjectLogic loaded = loadObject(file);
+
+                if (loaded != null) {
+                    //REGRESSION
+                    //EnvironmentLogic env = EnvironmentPersistence.getEnvByUUID(loaded.getPojo().getEnvironmentID());
+                    //if (env != null) {
+//                        loaded.setEnvironment(env);
+//                    } else {
+//                        loaded.setEnvironment(EnvironmentPersistence.getEnvironments().get(0));
+//                        LOG.warning("Reset environment UUID of object " + loaded.getPojo().getName()
+//                                + " to the default environment. This is because the environment UUID "
+//                                + loaded.getPojo().getEnvironmentID() + " does not exists.");
+//                    }
+                    insert(loaded);
+                }
+            }
+        }
+    }
+
+    /**
      * Loads the object file from file but NOT add the object to the list
      *
      * @param file
      * @return an EnvObjectLogic or null
      * @throws it.freedomotic.exceptions.DaoLayerException
      */
-    private EnvObjectLogic loadFromFilesystem(File file) throws DaoLayerException {
+    private EnvObjectLogic loadObject(File file) throws DaoLayerException {
         XStream xstream = FreedomXStream.getXstream();
         try {
             String xml = DOMValidateDTD.validate(file, Info.getApplicationPath()
@@ -249,7 +279,7 @@ public class XmlEnvObjectDao implements EnvObjectDao {
 
             EnvObject pojo = (EnvObject) xstream.fromXML(xml);
             EnvObjectLogic obj = EnvObjectFactory.create(pojo);
-            LOG.log(Level.FINE, "Created a new logic for {0} of type {1}",
+            LOG.log(Level.INFO, "Created a new logic for {0} of type {1}",
                     new Object[]{obj.getPojo().getName(),
                         obj.getClass().getCanonicalName().toString()});
             return obj;
@@ -262,18 +292,18 @@ public class XmlEnvObjectDao implements EnvObjectDao {
 
     private void saveToFilesystem() throws DaoLayerException {
         if (objects.isEmpty()) {
-            throw new DaoLayerException("There are no object to persist, " + folder.getAbsolutePath()
+            throw new DaoLayerException("There are no object to persist, " + FOLDER.getAbsolutePath()
                     + " will not be altered.");
         }
 
-        if (!folder.isDirectory()) {
-            throw new DaoLayerException(folder.getAbsoluteFile() + " is not a valid object folder. Skipped");
+        if (!FOLDER.isDirectory()) {
+            throw new DaoLayerException(FOLDER.getAbsoluteFile() + " is not a valid object folder. Skipped");
         }
 
         try {
             XStream xstream = FreedomXStream.getXstream();
             //cleanup the folder
-            deleteObjectFiles(folder);
+            deleteObjectFiles(FOLDER);
 
             for (EnvObjectLogic obj : objects.values()) {
                 String uuid = obj.getPojo().getUUID();
@@ -287,9 +317,8 @@ public class XmlEnvObjectDao implements EnvObjectDao {
                 //    obj.getPojo()
                 //            .setEnvironmentID(envDao.findDefault().getUUID());
                 //}
-
                 String fileName = obj.getPojo().getUUID() + ".xobj";
-                BufferedWriter out = new BufferedWriter(new FileWriter(folder + "/" + fileName));
+                BufferedWriter out = new BufferedWriter(new FileWriter(FOLDER + "/" + fileName));
                 //persist only the data not the logic
                 out.write(xstream.toXML(obj.getPojo()));
                 //Close the output stream

@@ -94,7 +94,7 @@ public class Freedomotic implements BusConsumer {
      * only!!
      */
     public static final Injector INJECTOR = Guice.createInjector(new InjectorCommons(), new InjectXmlDao());
-    
+
     //dependencies
     private final ClientStorage clientStorage;
     private final PluginsManager pluginsManager;
@@ -134,7 +134,6 @@ public class Freedomotic implements BusConsumer {
 
         // init localization
         //REGRESSION: api.getI18n().setDefaultLocale(config.getStringProperty("KEY_ENABLE_I18N", "no"));
-
         // init auth* framework
         //REGRESSION:auth.initBaseRealm();
 //        if (auth.isInited()) {
@@ -145,10 +144,9 @@ public class Freedomotic implements BusConsumer {
 //            threadState.bind();
 //            LOG.info("Booting as user:" + auth.getSubject().getPrincipal() +". Session will last:"+auth.getSubject().getSession().getTimeout());
 //        }
-
-        String resourcesPath =
-                new File(Info.getApplicationPath()
-                + config.getStringProperty("KEY_RESOURCES_PATH", "/build/classes/it/freedom/resources/")).getPath();
+        String resourcesPath
+                = new File(Info.getApplicationPath()
+                        + config.getStringProperty("KEY_RESOURCES_PATH", "/build/classes/it/freedom/resources/")).getPath();
         //REGRESSION: LOG.info("\nOS: " + System.getProperty("os.name") + "\n" + api.getI18n().msg("architecture") + ": "
         //        + System.getProperty("os.arch") + "\n" + "OS Version: " + System.getProperty("os.version")
         //        + "\n" + api.getI18n().msg("user") + ": " + System.getProperty("user.name") + "\n" + "Java Home: "
@@ -240,6 +238,7 @@ public class Freedomotic implements BusConsumer {
         /**
          * ******************************************************************
          * Dynamically load events jar files in /plugin/events folder
+         * THE ORDER IN WHICH EVENTS, OBJECTS AND DEVICES ARE LOADED IS IMPORTANT
          * *****************************************************************
          */
         try {
@@ -249,18 +248,7 @@ public class Freedomotic implements BusConsumer {
                     "Cannot load event plugin {0}. {1}",
                     new Object[]{ex.getPluginName(), ex.getMessage()});
         }
-        /* ******************************************************************
-         * Loads sensors and actuators This must be loaded before object
-         * deserialization because objects can user hardware level commands and
-         * trigger that are loaded at this stage
-         * *****************************************************************
-         */
-        try {
-            pluginsManager.loadAllPlugins(PluginsManager.TYPE_DEVICE);
-        } catch (PluginLoadingException ex) {
-            LOG.warning("Cannot load device plugin " + ex.getPluginName() + ": " + ex.getMessage());
-            ex.printStackTrace();
-        }
+
         /**
          * ******************************************************************
          * Dynamically load objects jar files in /plugin/objects folder
@@ -272,6 +260,19 @@ public class Freedomotic implements BusConsumer {
             LOG.log(Level.WARNING,
                     "Cannot load object plugin {0}. {1}",
                     new Object[]{ex.getPluginName(), ex.getMessage()});
+        }
+
+        /* ******************************************************************
+         * Loads sensors and actuators This must be loaded before object
+         * deserialization because objects can user hardware level commands and
+         * trigger that are loaded at this stage
+         * *****************************************************************
+         */
+        try {
+            pluginsManager.loadAllPlugins(PluginsManager.TYPE_DEVICE);
+        } catch (PluginLoadingException ex) {
+            LOG.warning("Cannot load device plugin " + ex.getPluginName() + ": " + ex.getMessage());
+            ex.printStackTrace();
         }
 
         /**
@@ -327,7 +328,6 @@ public class Freedomotic implements BusConsumer {
         // REMOVED: now it's up to EnvironmentPersistence to load objects.
         // EnvObjectPersistence.loadObjects(EnvironmentPersistence.getEnvironments().get(0).getObjectFolder(), false);
         //loadDefaultEnvironment();
-
         /**
          * ******************************************************************
          * Init frontends sending an object changed behavior event
@@ -417,23 +417,21 @@ public class Freedomotic implements BusConsumer {
     }
 
     // FIXME This shouldn't be done through this method
-
     /**
      *
      * @param event
      */
-        public static void sendEvent(EventTemplate event) {
+    public static void sendEvent(EventTemplate event) {
         busService.send(event);
     }
 
     // FIXME This shouldn't be done through this method
-
     /**
      *
      * @param command
      * @return
      */
-        public static Command sendCommand(final Command command) {
+    public static Command sendCommand(final Command command) {
         return busService.send(command);
     }
 
@@ -531,8 +529,8 @@ public class Freedomotic implements BusConsumer {
         ReactionPersistence.saveReactions(new File(savedDataRoot + "/rea"));
 
         //save the environment
-        String environmentFilePath =
-                Info.getApplicationPath() + "/data/furn/" + config.getProperty("KEY_ROOM_XML_PATH");
+        String environmentFilePath
+                = Info.getApplicationPath() + "/data/furn/" + config.getProperty("KEY_ROOM_XML_PATH");
         File folder = null;
 
 //        try {
@@ -552,7 +550,6 @@ public class Freedomotic implements BusConsumer {
 //        } catch (DaoLayerException ex) {
 //            LOG.severe("Cannot save environment to folder " + folder + "due to " + ex.getCause());
 //        }
-
         System.exit(0);
     }
 

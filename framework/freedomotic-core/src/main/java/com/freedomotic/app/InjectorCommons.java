@@ -4,6 +4,8 @@
  */
 package com.freedomotic.app;
 
+import com.freedomotic.api.API;
+import com.freedomotic.api.APIStandardImpl;
 import com.freedomotic.bus.BusService;
 import com.freedomotic.bus.impl.BusServiceImpl;
 import com.freedomotic.core.JoinPlugin;
@@ -50,6 +52,8 @@ public class InjectorCommons extends AbstractModule {
         //requestStaticInjection(I18n.class);
 
         bind(BusService.class).to(BusServiceImpl.class).in(Singleton.class);
+
+        bind(API.class).to(APIStandardImpl.class).in(Singleton.class);
 
         /*
          * XML Environment dependencies

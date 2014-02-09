@@ -48,6 +48,7 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
+
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 /**
@@ -57,7 +58,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 public class EnvObjectLogic {
 
     //REGRESSION: change to @Inject
-    private BusService busService;
+    private final BusService busService;
 
     private EnvObject pojo;
     private boolean changed;
@@ -66,7 +67,7 @@ public class EnvObjectLogic {
     private HashMap<String, BehaviorLogic> behaviors = new HashMap<String, BehaviorLogic>();
     private EnvironmentLogic environment;
     @Inject
-    EnvironmentDao envDao;
+    protected EnvironmentDao envDao;
 
     /**
      *
@@ -375,13 +376,9 @@ public class EnvObjectLogic {
      */
     @RequiresPermissions("objects:create")
     public final void setRandomLocation() {
-        int randomX
-                = 0
-                + (int) (Math.random() * envDao.findDefault().getWidth());
-        int randomY
-                = 0
-                + (int) (Math.random() * envDao.findDefault().getHeight());
-        setLocation(randomX, randomY);
+        int randomX= (int) (Math.random() * envDao.findDefault().getWidth());
+        int randomY = (int) (Math.random() * envDao.findDefault().getHeight());
+        setLocation(randomX, randomY); //use randx randy when regression is fixed
     }
 
     /**
@@ -560,6 +557,10 @@ public class EnvObjectLogic {
         }
 
         this.pojo = pojo;
+        //REGRESSION: comment this. REMEMBER to move any envDao reference out of objects
+        //use the init() on object only when it is inserted in an environment
+        //and there do any topology related inizialization (for example in Gate is 
+        //at this time that you should check which rooms this gate connects.
         this.environment = envDao.findByUuid(pojo.getEnvironmentID());
     }
 

@@ -55,8 +55,6 @@ public class Gate extends EnvObjectLogic {
     private Room to;
     protected RangedIntBehaviorLogic openness;
     protected BooleanBehaviorLogic open;
-    @Inject
-    EnvironmentDao envDao;
 
     @Override
     public void init() {

@@ -135,6 +135,8 @@ public interface API {
      * @return
      */
      Collection<EnvironmentLogic> getEnvironments();
+     
+     EnvironmentLogic getDefaultEnvironments();
 
     /**
      *

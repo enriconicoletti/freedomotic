@@ -192,12 +192,13 @@ public class ObjectPluginPlaceholder implements Client {
     }
 
     /**
-     * Loads the object file from file but NOT add the object to the list
+     * Loads the object from file. It NOT adds the object to the list
      *
      * @param file
      * @return
      */
-    //REGRESSION
+    //REGRESSION: needed to load a single object given a filename which contains it
+    //it should be managed withing the dao layer
     public static EnvObjectLogic loadObject(File file) throws DaoLayerException {
         XStream xstream = FreedomXStream.getXstream();
 

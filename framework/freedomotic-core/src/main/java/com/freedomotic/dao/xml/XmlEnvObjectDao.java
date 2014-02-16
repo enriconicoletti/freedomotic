@@ -87,7 +87,7 @@ public class XmlEnvObjectDao implements EnvObjectDao {
 
         //defensive copy to not affect the passed object with the changes
         EnvObject pojoCopy = SerialClone.clone(obj.getPojo());
-        //search for same or similar names and append an ordinal roman number if needed
+        //search for same name and append an ordinal roman number if needed
         int occurrences = 0;
         for (EnvObjectLogic item : objects.values()) {
             if (item.getPojo().getName().equalsIgnoreCase(item.getPojo().getName())) {
@@ -113,8 +113,8 @@ public class XmlEnvObjectDao implements EnvObjectDao {
         }
 
         if (!objects.containsKey(obj.getPojo().getName())) {
-            //REGRESSION: obj.init(); an object should be initialized only when inserted into environment
             objects.put(obj.getPojo().getName(), obj);
+            //REGRESSION: obj.init(); an object should be initialized only when inserted into environment
             obj.init();
             obj.setChanged(true);
         } else {

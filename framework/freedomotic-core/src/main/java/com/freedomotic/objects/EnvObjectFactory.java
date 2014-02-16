@@ -56,14 +56,13 @@ public final class EnvObjectFactory {
             Class<?> clazz = classLoader.loadClass(pojo.getHierarchy()); //eg: com.freedomotic.objects.impl.ElectricDevice
 
             EnvObjectLogic logic = null;
-            try {
-                logic = (EnvObjectLogic) clazz.newInstance();
-            } catch (InstantiationException ex) {
-                Logger.getLogger(EnvObjectFactory.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(EnvObjectFactory.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            Freedomotic.INJECTOR.injectMembers(logic);
+//            try {
+                logic = (EnvObjectLogic) Freedomotic.INJECTOR.getInstance(clazz);
+//            } catch (InstantiationException ex) {
+//                Logger.getLogger(EnvObjectFactory.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (IllegalAccessException ex) {
+//                Logger.getLogger(EnvObjectFactory.class.getName()).log(Level.SEVERE, null, ex);
+//            }
             logic.setPojo(pojo);
 
             return logic;

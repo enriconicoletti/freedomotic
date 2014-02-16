@@ -115,7 +115,7 @@ public class PluginsManagerImpl implements PluginsManager {
                 Freedomotic.INJECTOR.injectMembers(p);
                 p.loadPermissionsFromManifest();
                 if (p.getConfiguration().getBooleanProperty("enable-i18n", false)) {
-                    //REGRESSION: p.getApi().getI18n().registerPluginBundleDir(p);
+                    p.getApi().getI18n().registerPluginBundleDir(p);
                 }
             }
             clientStorage.add(client);

@@ -40,6 +40,7 @@ import com.freedomotic.reactions.Statement;
 import com.freedomotic.reactions.Trigger;
 import com.freedomotic.reactions.TriggerPersistence;
 import com.freedomotic.util.TopologyUtils;
+import com.google.inject.Inject;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,7 +48,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.inject.Inject;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
@@ -57,8 +57,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
  */
 public class EnvObjectLogic {
 
-    //REGRESSION: change to @Inject
-    private final BusService busService;
+    private BusService busService;
     private EnvObject pojo;
     private boolean changed;
     // private String message;
@@ -66,14 +65,14 @@ public class EnvObjectLogic {
     private HashMap<String, BehaviorLogic> behaviors = new HashMap<String, BehaviorLogic>();
     private EnvironmentLogic environment;
     //@Inject
-    //protected EnvironmentDao envDao;
+    private EnvironmentDao envDao;
 
     /**
      *
      */
     public EnvObjectLogic() {
-        super();
         this.busService = Freedomotic.INJECTOR.getInstance(BusService.class);
+        //this.envDao = Freedomotic.INJECTOR.getInstance(EnvironmentDao.class);
         this.busService.init();
     }
 
@@ -171,10 +170,8 @@ public class EnvObjectLogic {
     @RequiresPermissions("objects:update")
     public void setAction(String action, Command command) {
         if ((action != null) && !action.isEmpty() && (command != null)) {
-            commandsMapping.put(action.trim(),
-                    command);
-            pojo.getActions().setProperty(action.trim(),
-                    command.getName());
+            commandsMapping.put(action.trim(), command);
+            pojo.getActions().setProperty(action.trim(),command.getName());
         }
     }
 
@@ -271,7 +268,7 @@ public class EnvObjectLogic {
         //validation
         if (pojo == null) {
             throw new IllegalStateException("An object must have a valid pojo before initialization");
-        }
+        }       
         //DISABLED pojo.initTags();
         createCommands();
         createTriggers();
@@ -279,7 +276,17 @@ public class EnvObjectLogic {
         cacheDeveloperLevelCommand();
         //assign to an environment
         //REGRESSION: MOVE TO ENVIRONMENT INITIALIZATION: this.setEnvironment(environment);
-        checkTopology();
+        //checkTopology();
+        
+                //REGRESSION
+       if (((pojo.getEnvironmentID() == null) || pojo.getEnvironmentID().isEmpty())
+                && (envDao.findAll().size() > 0)) {
+            pojo.setEnvironmentID(envDao.findDefault().getUUID());
+        }
+        //this.environment = envDao.findByUuid(pojo.getEnvironmentID());
+        //assign to an environment
+        //REGRESSION: MOVE TO ENVIRONMENT INITIALIZATION: 
+        //this.setEnvironment(environment);
 
     }
 
@@ -377,9 +384,9 @@ public class EnvObjectLogic {
      */
     @RequiresPermissions("objects:create")
     public final void setRandomLocation() {
-        //int randomX= (int) (Math.random() * envDao.findDefault().getWidth());
-        //int randomY = (int) (Math.random() * envDao.findDefault().getHeight());
-        setLocation(100, 100); //use randx randy when regression is fixed
+        int randomX = (int) (Math.random() * envDao.findDefault().getWidth());
+        int randomY = (int) (Math.random() * envDao.findDefault().getHeight());
+        setLocation(randomX, randomY); //use randx randy when regression is fixed
     }
 
     /**
@@ -392,7 +399,6 @@ public class EnvObjectLogic {
         for (Representation rep : getPojo().getRepresentations()) {
             rep.setOffset(x, y);
         }
-
         checkTopology();
     }
 
@@ -406,21 +412,21 @@ public class EnvObjectLogic {
         FreedomPolygon translatedObject
                 = (FreedomPolygon) TopologyUtils.translate((FreedomPolygon) shape, xoffset, yoffset);
 
-//REGRESSION:        for (EnvironmentLogic locEnv : envDao.findAll()) {
-//            for (ZoneLogic zone : locEnv.getZones()) {
-//                //remove from every zone
-//                zone.getPojo().getObjects().remove(this.getPojo());
-//                if (this.getEnvironment() == locEnv && TopologyUtils.intersects(translatedObject, zone.getPojo().getShape())) {
-//                    //DEBUG: System.out.println("object " + getPojo().getName() + " intersects zone " + zone.getPojo().getName());
-//                    //add to the zones this object belongs
-//                    zone.getPojo().getObjects().add(this.getPojo());
-//                    LOG.log(Level.CONFIG, "Object {0} is in zone {1}",
-//                            new Object[]{getPojo().getName(), zone.getPojo().getName()});
-//                } else {
-//                    //DEBUG: System.out.println("object " + getPojo().getName() + " NOT intersects zone " + zone.getPojo().getName());
-//                }
-//            }
-//        }
+        for (EnvironmentLogic locEnv : envDao.findAll()) {
+            for (ZoneLogic zone : locEnv.getZones()) {
+                //remove from every zone
+                zone.getPojo().getObjects().remove(this.getPojo());
+                if (this.getEnvironment() == locEnv && TopologyUtils.intersects(translatedObject, zone.getPojo().getShape())) {
+                    //DEBUG: System.out.println("object " + getPojo().getName() + " intersects zone " + zone.getPojo().getName());
+                    //add to the zones this object belongs
+                    zone.getPojo().getObjects().add(this.getPojo());
+                    LOG.log(Level.CONFIG, "Object {0} is in zone {1}",
+                            new Object[]{getPojo().getName(), zone.getPojo().getName()});
+                } else {
+                    //DEBUG: System.out.println("object " + getPojo().getName() + " NOT intersects zone " + zone.getPojo().getName());
+                }
+            }
+        }
     }
 
     /**
@@ -552,13 +558,13 @@ public class EnvObjectLogic {
      */
     @RequiresPermissions("objects:update")
     public void setPojo(EnvObject pojo) {
-//REGRESSION:        if (((pojo.getEnvironmentID() == null) || pojo.getEnvironmentID().isEmpty())
-//        && (envDao.findAll().size() > 0)) {
+//REGRESSION MOVED TO INIT        if (((pojo.getEnvironmentID() == null) || pojo.getEnvironmentID().isEmpty())
+//                && (envDao.findAll().size() > 0)) {
 //            pojo.setEnvironmentID(envDao.findDefault().getUUID());
 //        }
 
         this.pojo = pojo;
-        //REGRESSION: comment this. REMEMBER to move any envDao reference out of objects
+        //REGRESSION (MOVED TO INIT): comment this. REMEMBER to move any envDao reference out of objects
         //use the init() on object only when it is inserted in an environment
         //and there do any topology related inizialization (for example in Gate is 
         //at this time that you should check which rooms this gate connects.

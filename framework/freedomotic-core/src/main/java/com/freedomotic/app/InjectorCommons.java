@@ -16,6 +16,7 @@ import com.freedomotic.dao.EnvironmentDao;
 import com.freedomotic.dao.xml.XmlEnvObjectDao;
 import com.freedomotic.dao.xml.XmlEnvironmentDao;
 import com.freedomotic.events.ProtocolRead;
+import com.freedomotic.objects.EnvObjectLogic;
 import com.freedomotic.plugins.ClientStorage;
 import com.freedomotic.plugins.ClientStorageInMemory;
 import com.freedomotic.plugins.filesystem.PluginsManager;
@@ -45,6 +46,8 @@ public class InjectorCommons extends AbstractModule {
         bind(TriggerCheck.class).in(Singleton.class);
         
         bind(ProtocolRead.class);
+        
+        bind(EnvObjectLogic.class).in(Singleton.class);
 
         bind(AppConfig.class).to(AppConfigImpl.class).in(Singleton.class);
 

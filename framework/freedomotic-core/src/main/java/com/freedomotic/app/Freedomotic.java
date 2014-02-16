@@ -44,6 +44,7 @@ import com.freedomotic.reactions.ReactionPersistence;
 import com.freedomotic.reactions.TriggerPersistence;
 import com.freedomotic.security.Auth;
 import com.freedomotic.serial.SerialConnectionProvider;
+import com.freedomotic.util.I18n.I18n;
 import com.freedomotic.util.Info;
 import com.freedomotic.util.LogFormatter;
 import com.google.inject.Guice;
@@ -98,6 +99,7 @@ public class Freedomotic implements BusConsumer {
     //dependencies
     private final ClientStorage clientStorage;
     private final PluginsManager pluginsManager;
+    private I18n i18n;
     private AppConfig config;
     private Auth auth;
     private BusMessagesListener listener;
@@ -114,10 +116,14 @@ public class Freedomotic implements BusConsumer {
     public Freedomotic(
             PluginsManager pluginsLoader,
             ClientStorage clientStorage,
-            AppConfig config) {
+            AppConfig config,
+            I18n i18n,
+            Auth auth) {
         this.pluginsManager = pluginsLoader;
         this.clientStorage = clientStorage;
         this.config = config;
+        this.i18n = i18n;
+        this.auth = auth;
     }
 
     /**
@@ -133,9 +139,9 @@ public class Freedomotic implements BusConsumer {
         loadAppConfig();
 
         // init localization
-        //REGRESSION: api.getI18n().setDefaultLocale(config.getStringProperty("KEY_ENABLE_I18N", "no"));
-        // init auth* framework
-        //REGRESSION:auth.initBaseRealm();
+        i18n.setDefaultLocale(config.getStringProperty("KEY_ENABLE_I18N", "no"));
+        //REGRESSION: init auth* framework
+//        auth.initBaseRealm();
 //        if (auth.isInited()) {
 //            PrincipalCollection principals = new SimplePrincipalCollection("system", "com.freedomotic.security");
 //            Subject SysSubject = new Subject.Builder().principals(principals).buildSubject();
@@ -147,13 +153,13 @@ public class Freedomotic implements BusConsumer {
         String resourcesPath
                 = new File(Info.getApplicationPath()
                         + config.getStringProperty("KEY_RESOURCES_PATH", "/build/classes/it/freedom/resources/")).getPath();
-        //REGRESSION: LOG.info("\nOS: " + System.getProperty("os.name") + "\n" + api.getI18n().msg("architecture") + ": "
-        //        + System.getProperty("os.arch") + "\n" + "OS Version: " + System.getProperty("os.version")
-        //        + "\n" + api.getI18n().msg("user") + ": " + System.getProperty("user.name") + "\n" + "Java Home: "
-        //        + System.getProperty("java.home") + "\n" + "Java Library Path: {"
-        //        + System.getProperty("java.library.path") + "}\n" + "Program path: "
-        //        + System.getProperty("user.dir") + "\n" + "Java Version: " + System.getProperty("java.version")
-        //        + "\n" + "Resources Path: " + resourcesPath);
+        LOG.info("\nOS: " + System.getProperty("os.name") + "\n" + i18n.msg("architecture") + ": "
+                + System.getProperty("os.arch") + "\n" + "OS Version: " + System.getProperty("os.version")
+                + "\n" + i18n.msg("user") + ": " + System.getProperty("user.name") + "\n" + "Java Home: "
+                + System.getProperty("java.home") + "\n" + "Java Library Path: {"
+                + System.getProperty("java.library.path") + "}\n" + "Program path: "
+                + System.getProperty("user.dir") + "\n" + "Java Version: " + System.getProperty("java.version")
+                + "\n" + "Resources Path: " + resourcesPath);
 
         // Initialize bus here!
         busService = INJECTOR.getInstance(BusService.class);
@@ -196,7 +202,7 @@ public class Freedomotic implements BusConsumer {
                 handler.setFormatter(new LogFormatter());
                 logger.setLevel(Level.ALL);
                 logger.addHandler(handler);
-                //REGRESSION: logger.config(api.getI18n().msg("INIT_MESSAGE"));
+                logger.config(i18n.msg("INIT_MESSAGE"));
 
                 if ((config.getBooleanProperty("KEY_LOGGER_POPUP", true) == true)
                         && (java.awt.Desktop.getDesktop().isSupported(Desktop.Action.BROWSE))) {

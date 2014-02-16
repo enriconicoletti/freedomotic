@@ -22,7 +22,7 @@ import com.google.inject.Singleton;
 public class InjectXmlDao extends AbstractModule {
 
     @Override
-    protected void configure() {
+    protected void configure() {        
         /*
          * XML Environment dependencies
          */

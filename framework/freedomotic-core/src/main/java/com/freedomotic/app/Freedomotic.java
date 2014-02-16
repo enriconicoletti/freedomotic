@@ -356,11 +356,10 @@ public class Freedomotic implements BusConsumer {
         TriggerPersistence.loadTriggers(new File(Info.PATH_DATA_FOLDER + "/trg/"));
         CommandPersistence.loadCommands(new File(Info.PATH_DATA_FOLDER + "/cmd/"));
         ReactionPersistence.loadReactions(new File(Info.PATH_DATA_FOLDER + "/rea/"));
-
         /**
          * A service to add environment objects using XML commands
          */
-        new BehaviorManager();
+        //new BehaviorManager();
         new SerialConnectionProvider();
 
         /**

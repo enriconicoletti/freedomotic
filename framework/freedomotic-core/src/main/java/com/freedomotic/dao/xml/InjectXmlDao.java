@@ -4,7 +4,6 @@
  */
 package com.freedomotic.dao.xml;
 
-
 import com.freedomotic.app.AppConfig;
 import com.freedomotic.app.AppConfigImpl;
 import com.freedomotic.bus.BusService;

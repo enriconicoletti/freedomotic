@@ -29,6 +29,8 @@ import com.freedomotic.model.object.Representation;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -53,15 +55,15 @@ public final class EnvObjectFactory {
             URLClassLoader classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
             Class<?> clazz = classLoader.loadClass(pojo.getHierarchy()); //eg: com.freedomotic.objects.impl.ElectricDevice
 
-            EnvObjectLogic logic = (EnvObjectLogic) Freedomotic.INJECTOR.getInstance(clazz);
-//            EnvObjectLogic logic = null;
-//            try {
-//                logic = (EnvObjectLogic) clazz.newInstance();
-//            } catch (InstantiationException ex) {
-//                Logger.getLogger(EnvObjectFactory.class.getName()).log(Level.SEVERE, null, ex);
-//            } catch (IllegalAccessException ex) {
-//                Logger.getLogger(EnvObjectFactory.class.getName()).log(Level.SEVERE, null, ex);
-//            }
+            EnvObjectLogic logic = null;
+            try {
+                logic = (EnvObjectLogic) clazz.newInstance();
+            } catch (InstantiationException ex) {
+                Logger.getLogger(EnvObjectFactory.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(EnvObjectFactory.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            Freedomotic.INJECTOR.injectMembers(logic);
             logic.setPojo(pojo);
 
             return logic;

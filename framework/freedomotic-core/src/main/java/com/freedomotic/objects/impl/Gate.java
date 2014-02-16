@@ -167,22 +167,22 @@ public class Gate extends EnvObjectLogic {
     @Override
     public final void setChanged(boolean value) {
         //update the room that can be reached
-        for (EnvironmentLogic env : envDao.findAll()) {
-            for (ZoneLogic z : env.getZones()) {
-                if (z instanceof Room) {
-                    final Room room = (Room) z;
-                    //the gate is opened or closed we update the reachable rooms
-                    room.visit();
-                }
-            }
-
-            for (ZoneLogic z : env.getZones()) {
-                if (z instanceof Room) {
-                    final Room room = (Room) z;
-                    room.updateDescription();
-                }
-            }
-        }
+//REGRESSION:        for (EnvironmentLogic env : envDao.findAll()) {
+//            for (ZoneLogic z : env.getZones()) {
+//                if (z instanceof Room) {
+//                    final Room room = (Room) z;
+//                    //the gate is opened or closed we update the reachable rooms
+//                    room.visit();
+//                }
+//            }
+//
+//            for (ZoneLogic z : env.getZones()) {
+//                if (z instanceof Room) {
+//                    final Room room = (Room) z;
+//                    room.updateDescription();
+//                }
+//            }
+//        }
 
         //then executeCommand the super which notifies the event
         super.setChanged(true);
@@ -254,43 +254,45 @@ public class Gate extends EnvObjectLogic {
 //                }
 //            }
 //        }
-        FreedomPolygon objShape =
-                TopologyUtils.rotate(TopologyUtils.translate(pojoShape, xoffset, yoffset),
-                (int) representation.getRotation());
-        EnvironmentLogic env = envDao.findByUuid(this.getPojo().getEnvironmentID());
-
-        if (env != null) {
-            for (Room room : env.getRooms()) {
-                if (TopologyUtils.intersects(objShape,
-                        room.getPojo().getShape())) {
-                    if (from == null) {
-                        from = (Room) room;
-                        to = (Room) room;
-                    } else {
-                        to = (Room) room;
-                    }
-                }
-            }
-        } else {
-            LOG.severe("The gate '" + getPojo().getName()
-                    + "' is not linked to any any environment");
-        }
-
-        if (to != from) {
-            getPojo().setDescription("Connects " + from + " to " + to);
-            from.addGate(this); //informs the room that it has a gate to another room
-            to.addGate(this); //informs the room that it has a gate to another room
-        } else {
-            //the gate interects two equals zones
-            if (from != null) {
-                LOG.warning("The gate '" + getPojo().getName() + "' connects the same zones ["
-                        + from.getPojo().getName() + "; " + to.getPojo().getName()
-                        + "]. This is not possible.");
-            }
-        }
-
-        //notify if the passage connect two rooms
-        LOG.config("The gate '" + getPojo().getName() + "' connects " + from + " to " + to);
+        
+        //REGRESSION
+//        FreedomPolygon objShape =
+//                TopologyUtils.rotate(TopologyUtils.translate(pojoShape, xoffset, yoffset),
+//                (int) representation.getRotation());
+//        EnvironmentLogic env = envDao.findByUuid(this.getPojo().getEnvironmentID());
+//
+//        if (env != null) {
+//            for (Room room : env.getRooms()) {
+//                if (TopologyUtils.intersects(objShape,
+//                        room.getPojo().getShape())) {
+//                    if (from == null) {
+//                        from = (Room) room;
+//                        to = (Room) room;
+//                    } else {
+//                        to = (Room) room;
+//                    }
+//                }
+//            }
+//        } else {
+//            LOG.severe("The gate '" + getPojo().getName()
+//                    + "' is not linked to any any environment");
+//        }
+//
+//        if (to != from) {
+//            getPojo().setDescription("Connects " + from + " to " + to);
+//            from.addGate(this); //informs the room that it has a gate to another room
+//            to.addGate(this); //informs the room that it has a gate to another room
+//        } else {
+//            //the gate interects two equals zones
+//            if (from != null) {
+//                LOG.warning("The gate '" + getPojo().getName() + "' connects the same zones ["
+//                        + from.getPojo().getName() + "; " + to.getPojo().getName()
+//                        + "]. This is not possible.");
+//            }
+//        }
+//
+//        //notify if the passage connect two rooms
+//        LOG.config("The gate '" + getPojo().getName() + "' connects " + from + " to " + to);
     }
 
     /**

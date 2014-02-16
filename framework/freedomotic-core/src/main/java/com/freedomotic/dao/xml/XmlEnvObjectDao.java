@@ -90,8 +90,7 @@ public class XmlEnvObjectDao implements EnvObjectDao {
         //search for same or similar names and append an ordinal roman number if needed
         int occurrences = 0;
         for (EnvObjectLogic item : objects.values()) {
-            if (item.getPojo().getName().trim().toLowerCase()
-                    .startsWith(item.getPojo().getName().toLowerCase())) {
+            if (item.getPojo().getName().equalsIgnoreCase(item.getPojo().getName())) {
                 occurrences++;
             }
         }
@@ -116,6 +115,7 @@ public class XmlEnvObjectDao implements EnvObjectDao {
         if (!objects.containsKey(obj.getPojo().getName())) {
             //REGRESSION: obj.init(); an object should be initialized only when inserted into environment
             objects.put(obj.getPojo().getName(), obj);
+            obj.init();
             obj.setChanged(true);
         } else {
             throw new RuntimeException("Cannot add the same object more than one time");

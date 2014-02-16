@@ -413,8 +413,7 @@ public final class Command implements Serializable, Cloneable {
      * @throws CloneNotSupportedException
      */
     @Override
-    public Command clone()
-            throws CloneNotSupportedException {
+    public Command clone() throws CloneNotSupportedException {
         super.clone();
 
         Command clonedCmd = new Command();

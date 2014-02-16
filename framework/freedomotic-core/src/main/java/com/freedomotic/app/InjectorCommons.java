@@ -8,6 +8,7 @@ import com.freedomotic.api.API;
 import com.freedomotic.api.APIStandardImpl;
 import com.freedomotic.bus.BusService;
 import com.freedomotic.bus.impl.BusServiceImpl;
+import com.freedomotic.core.BehaviorManager;
 import com.freedomotic.core.JoinPlugin;
 import com.freedomotic.core.TriggerCheck;
 import com.freedomotic.dao.EnvObjectDao;
@@ -42,6 +43,7 @@ public class InjectorCommons extends AbstractModule {
         //bind(JoinDevice.class).in(Singleton.class);
         bind(JoinPlugin.class).in(Singleton.class);
         bind(TriggerCheck.class).in(Singleton.class);
+        
         bind(ProtocolRead.class);
 
         bind(AppConfig.class).to(AppConfigImpl.class).in(Singleton.class);

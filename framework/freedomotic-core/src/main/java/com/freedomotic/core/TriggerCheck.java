@@ -57,11 +57,14 @@ public final class TriggerCheck {
     private static final Logger LOG = Logger.getLogger(TriggerCheck.class.getName());
     private final EnvObjectDao objDao;
     private final BusService busService;
+    private final BehaviorManager behaviorManager;
+    
 
     @Inject
-    TriggerCheck(EnvObjectDao objDao, BusService busService) {
+    TriggerCheck(EnvObjectDao objDao, BusService busService, BehaviorManager behaviorManager) {
         this.objDao = objDao;
         this.busService = busService;
+        this.behaviorManager = behaviorManager;
     }
 
     /**
@@ -217,7 +220,7 @@ public final class TriggerCheck {
                                     //this command is for an object so it needs only to know only about event parameters
                                     Command resolvedCommand = commandResolver.resolve(command);
                                     //doing so we bypass messaging system gaining better performances
-                                    BehaviorManager.parseCommand(resolvedCommand);
+                                    behaviorManager.parseCommand(resolvedCommand);
                                 } else {
                                     //if the event has a target object we include also object info
                                     EnvObjectLogic targetObject

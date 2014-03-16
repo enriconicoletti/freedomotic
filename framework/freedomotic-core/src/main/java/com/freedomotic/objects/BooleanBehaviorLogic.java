@@ -66,6 +66,7 @@ public class BooleanBehaviorLogic
 
     @Override
     public synchronized final void filterParams(final Config params, boolean fireCommand) {
+        LOG.warning("Received config " + params);
         //filter accepted values
         String value = params.getProperty("value").trim();
 

@@ -392,10 +392,11 @@ public class EnvObjectLogic {
         for (Representation rep : getPojo().getRepresentations()) {
             rep.setOffset(x, y);
         }
-
-        checkTopology();
+        this.setChanged(true);
+        //checkTopology();
     }
 
+    @Deprecated
     @RequiresPermissions({"objects:read", "zones.update"})
     private void checkTopology() {
         FreedomShape shape = getPojo().getRepresentations().get(0).getShape();

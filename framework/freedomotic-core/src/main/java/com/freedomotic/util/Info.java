@@ -25,6 +25,7 @@ import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +41,7 @@ public class Info {
     /**
      *
      */
-        public static final Integer FRAMEWORK_MAJOR = 5;
+    public static final Integer FRAMEWORK_MAJOR = 5;
 
     /**
      *
@@ -76,13 +77,13 @@ public class Info {
     /**
      *
      */
-        public static final String PROJECT_MAIL = "info@freedomotic.com";
+    public static final String PROJECT_MAIL = "info@freedomotic.com";
     //framework base paths
 
     /**
      *
      */
-        public static final File PATH_WORKDIR = getWorkdir();
+    public static final File PATH_WORKDIR = getWorkdir();
 
     /**
      *
@@ -128,7 +129,7 @@ public class Info {
     /**
      *
      */
-        public static final String BROKER_IP = getLocalHost();
+    public static final String BROKER_IP = getLocalHost();
     //http://activemq.apache.org/activemq-3-transport-configurations.html
     //http://marcelojabali.blogspot.it/2011/10/apache-activemq-enhancements-to-jms.html
     //public static final String BROKER_DEFAULT = "vm://freedomotic";
@@ -137,7 +138,8 @@ public class Info {
     /**
      *
      */
-        public static final String BROKER_DEFAULT = "vm://localhost";//"peer://localhost/broker"+UUID.randomUUID();
+    //public static final String BROKER_DEFAULT = "vm://localhost";//"peer://localhost/broker"+UUID.randomUUID();
+    public static final String BROKER_DEFAULT = "peer://freedomotic/brokerA";
 
     /**
      *
@@ -158,7 +160,7 @@ public class Info {
     /**
      *
      */
-        public static final String CHANNEL_OBJECT_UPDATE = "app.event.object.behavior.change";
+    public static final String CHANNEL_OBJECT_UPDATE = "app.event.object.behavior.change";
 
     /**
      *
@@ -174,7 +176,7 @@ public class Info {
     /**
      *
      */
-        public static final int BEHAVIOR_MAX_PRIORITY = 9;
+    public static final int BEHAVIOR_MAX_PRIORITY = 9;
 
     /**
      *
@@ -187,14 +189,12 @@ public class Info {
         try {
             address = InetAddress.getLocalHost().toString();
 
-
         } catch (UnknownHostException ex) {
             Logger.getLogger(Info.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
 
         return address;
-
 
     }
 
@@ -331,8 +331,7 @@ public class Info {
 
     /**
      *
-     * @return
-     * @deprecated
+     * @return @deprecated
      */
     @Deprecated
     public static File getApplicationPath() {
@@ -341,8 +340,7 @@ public class Info {
 
     /**
      *
-     * @return
-     * @deprecated
+     * @return @deprecated
      */
     @Deprecated
     public static String getDatafilePath() {
@@ -351,8 +349,7 @@ public class Info {
 
     /**
      *
-     * @return
-     * @deprecated
+     * @return @deprecated
      */
     @Deprecated
     public static String getResourcesPath() {
@@ -361,8 +358,7 @@ public class Info {
 
     /**
      *
-     * @return
-     * @deprecated
+     * @return @deprecated
      */
     @Deprecated
     public static String getPluginsPath() {
@@ -371,8 +367,7 @@ public class Info {
 
     /**
      *
-     * @return
-     * @deprecated
+     * @return @deprecated
      */
     @Deprecated
     public static String getDevicesPath() {

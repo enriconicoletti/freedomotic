@@ -133,7 +133,7 @@ public class BusMessagesListener implements MessageListener {
 		try {
 
 			BusDestination busDestination = busService
-					.registerEventQueue(queueName);
+					.registerTopic(queueName);
 
 			registerOnQueue(busDestination);
 

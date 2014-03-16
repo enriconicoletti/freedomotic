@@ -20,7 +20,7 @@
 package com.freedomotic.events;
 
 import com.freedomotic.api.EventTemplate;
-import java.awt.Point;
+import com.freedomotic.model.geometry.FreedomPoint;
 import java.util.logging.Logger;
 
 /**
@@ -36,6 +36,7 @@ public final class PersonDetected extends EventTemplate {
     private final String uuid;
     private final int x;
     private final int y;
+    private final int z;
 
     /**
      *
@@ -43,21 +44,14 @@ public final class PersonDetected extends EventTemplate {
      * @param uuid
      * @param startLocation
      */
-    public PersonDetected(Object source, String uuid, Point startLocation) {
+    public PersonDetected(Object source, String uuid, FreedomPoint startLocation) {
         this.uuid = uuid;
-        x = (int) startLocation.getX();
-        y = (int) startLocation.getY();
+        x = startLocation.getX();
+        y = startLocation.getY();
+        z = 0;
         generateEventPayload();
     }
 
-//    public void applyChangesTo(PersonLogic p) {
-//        p.setCurrentLocation(startLocation);
-//        p.addDestination(startLocation);
-//        generateEventPayload();
-//    }
-//    public int getPersonId() {
-//        return id;
-//    }
     
     /**
      *
@@ -65,8 +59,10 @@ public final class PersonDetected extends EventTemplate {
     @Override
     protected void generateEventPayload() {
         payload.addStatement("id", uuid);
-        payload.addStatement("xCord", x);
-        payload.addStatement("yCord", y);
+        payload.addStatement("coord.x", x);
+        payload.addStatement("coord.y", y);
+        //TODO: z coordinate is currently not supported
+        payload.addStatement("coord.z", 0);
     }
 
     /**
@@ -91,6 +87,14 @@ public final class PersonDetected extends EventTemplate {
      */
     public int getY() {
         return y;
+    }
+    
+        /**
+     *
+     * @return
+     */
+    public int getZ() {
+        return z;
     }
 
     /**

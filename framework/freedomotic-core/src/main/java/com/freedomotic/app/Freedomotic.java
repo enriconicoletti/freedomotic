@@ -42,6 +42,7 @@ import com.freedomotic.marketplace.IPluginCategory;
 import com.freedomotic.marketplace.MarketPlaceService;
 import com.freedomotic.model.ds.ColorList;
 import com.freedomotic.model.environment.Environment;
+import com.freedomotic.objects.EnvObjectLogic;
 import com.freedomotic.objects.EnvObjectPersistence;
 import com.freedomotic.plugins.ClientStorage;
 import com.freedomotic.plugins.filesystem.PluginsManager;
@@ -50,6 +51,8 @@ import com.freedomotic.reactions.Command;
 import com.freedomotic.reactions.CommandPersistence;
 import com.freedomotic.reactions.ReactionPersistence;
 import com.freedomotic.reactions.TriggerPersistence;
+import com.freedomotic.repository.EnvObjectRepository;
+import com.freedomotic.repository.EnvironmentRepository;
 import com.freedomotic.security.Auth;
 import com.freedomotic.serial.SerialConnectionProvider;
 import com.freedomotic.util.Info;
@@ -125,6 +128,10 @@ public class Freedomotic implements BusConsumer {
     private BusMessagesListener listener;
     @Autowired
     private BusService busService;
+    @Autowired
+    private EnvironmentRepository envRepo;
+    @Autowired
+    private EnvObjectRepository objRepo;
 
     /**
      *
@@ -399,6 +406,16 @@ public class Freedomotic implements BusConsumer {
         LOG.config("Used Memory:" + ((runtime.totalMemory() - runtime.freeMemory()) / MB));
 
         LOG.info("Freedomotic startup completed");
+
+        for (EnvironmentLogic logic : EnvironmentPersistence.getEnvironments()) {
+            LOG.info("saving " + logic.getPojo().getName());
+            envRepo.save(logic.getPojo());
+        }
+
+        for (EnvObjectLogic logic : EnvObjectPersistence.getObjectList()) {
+            LOG.info("saving " + logic.getPojo().getName());
+            objRepo.save(logic.getPojo());
+        }
     }
 
     /**

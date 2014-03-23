@@ -1,36 +1,36 @@
 /**
  *
- * Copyright (c) 2009-2013 Freedomotic team
- * http://freedomotic.com
+ * Copyright (c) 2009-2013 Freedomotic team http://freedomotic.com
  *
  * This file is part of Freedomotic
  *
- * This Program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * This Program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2, or (at your option) any later version.
  *
- * This Program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This Program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Freedomotic; see the file COPYING.  If not, see
+ * You should have received a copy of the GNU General Public License along with
+ * Freedomotic; see the file COPYING. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package com.freedomotic.model.geometry;
 
 import java.io.Serializable;
+import javax.persistence.Embeddable;
 
 /**
  *
  * @author Enrico
  */
+@Embeddable
 public class FreedomPoint implements Serializable {
-   
+
     private static final long serialVersionUID = -54024055228629609L;
-	private int x;
+    private int x;
     private int y;
 
     /**
@@ -92,15 +92,18 @@ public class FreedomPoint implements Serializable {
     public boolean equals(Object object) {
         if (object instanceof FreedomPoint) {
             FreedomPoint point = (FreedomPoint) object;
-
-            if ((point.getX() == this.getX()) && (point.getY() == this.getY())) {
-                return true;
-            } else {
-                return false;
-            }
+            return (point.getX() == this.getX()) && (point.getY() == this.getY());
         }
 
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 89 * hash + this.x;
+        hash = 89 * hash + this.y;
+        return hash;
     }
 
     /**

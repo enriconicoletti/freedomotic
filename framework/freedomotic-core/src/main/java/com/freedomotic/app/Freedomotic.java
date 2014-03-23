@@ -45,6 +45,7 @@ import com.freedomotic.model.environment.Environment;
 import com.freedomotic.objects.EnvObjectPersistence;
 import com.freedomotic.plugins.ClientStorage;
 import com.freedomotic.plugins.filesystem.PluginsManager;
+import com.freedomotic.plugins.filesystem.PluginsManagerImpl;
 import com.freedomotic.reactions.Command;
 import com.freedomotic.reactions.CommandPersistence;
 import com.freedomotic.reactions.ReactionPersistence;
@@ -79,6 +80,8 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.support.SubjectThreadState;
 import org.apache.shiro.util.ThreadState;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * This is the starting class of the project
@@ -107,37 +110,21 @@ public class Freedomotic implements BusConsumer {
      */
     public static final Injector INJECTOR = Guice.createInjector(new DependenciesInjector());
     //dependencies
-    private final EnvironmentDAOFactory environmentDaoFactory;
-    private final ClientStorage clientStorage;
-    private final PluginsManager pluginsManager;
+    @Autowired
+    private EnvironmentDAO environmentDao;
+    @Autowired
+    private ClientStorage clientStorage;
+    @Autowired
+    private PluginsManager pluginsManager;
+    @Autowired
     private AppConfig config;
+    @Autowired
     private Auth auth;
+    @Autowired
     private API api;
     private BusMessagesListener listener;
-    // TODO remove static modifier once static methods sendEvent & sendCommand are erased.
-    private static BusService busService;
-
-    /**
-     *
-     * @param pluginsLoader
-     * @param joinDevice
-     * @param joinPlugin
-     * @param api
-     */
-    @Inject
-    public Freedomotic(
-            PluginsManager pluginsLoader,
-            EnvironmentDAOFactory environmentDaoFactory,
-            ClientStorage clientStorage,
-            AppConfig config,
-            API api) {
-        this.pluginsManager = pluginsLoader;
-        this.environmentDaoFactory = environmentDaoFactory;
-        this.clientStorage = clientStorage;
-        this.config = config;
-        this.api = api;
-        this.auth = api.getAuth();
-    }
+    @Autowired
+    private BusService busService;
 
     /**
      *
@@ -162,12 +149,12 @@ public class Freedomotic implements BusConsumer {
             SysSubject.getSession().setTimeout(-1);
             ThreadState threadState = new SubjectThreadState(SysSubject);
             threadState.bind();
-            LOG.info("Booting as user:" + auth.getSubject().getPrincipal() +". Session will last:"+auth.getSubject().getSession().getTimeout());
+            LOG.info("Booting as user:" + auth.getSubject().getPrincipal() + ". Session will last:" + auth.getSubject().getSession().getTimeout());
         }
 
-        String resourcesPath =
-                new File(Info.getApplicationPath()
-                + config.getStringProperty("KEY_RESOURCES_PATH", "/build/classes/it/freedom/resources/")).getPath();
+        String resourcesPath
+                = new File(Info.getApplicationPath()
+                        + config.getStringProperty("KEY_RESOURCES_PATH", "/build/classes/it/freedom/resources/")).getPath();
         LOG.info("\nOS: " + System.getProperty("os.name") + "\n" + api.getI18n().msg("architecture") + ": "
                 + System.getProperty("os.arch") + "\n" + "OS Version: " + System.getProperty("os.version")
                 + "\n" + api.getI18n().msg("user") + ": " + System.getProperty("user.name") + "\n" + "Java Home: "
@@ -436,8 +423,7 @@ public class Freedomotic implements BusConsumer {
 
         try {
             //EnvironmentPersistence.loadEnvironmentsFromDir(folder, false);
-            EnvironmentDAO loader = environmentDaoFactory.create(folder);
-            Collection<Environment> loaded = loader.load();
+            Collection<Environment> loaded = environmentDao.load();
 
             if (loaded == null) {
                 throw new IllegalStateException("Object data cannot be null at this stage");
@@ -445,7 +431,7 @@ public class Freedomotic implements BusConsumer {
             for (Environment env : loaded) {
                 EnvironmentLogic logic = INJECTOR.getInstance(EnvironmentLogic.class);
                 logic.setPojo(env);
-                logic.setSource(new File(folder + "/" + env.getUUID() + ".xenv"));
+                logic.setSource(new File(folder + "/" + env.getUuid() + ".xenv"));
                 EnvironmentPersistence.add(logic, false);
             }
 
@@ -478,24 +464,22 @@ public class Freedomotic implements BusConsumer {
     }
 
     // FIXME This shouldn't be done through this method
-
     /**
      *
      * @param event
      */
-        public static void sendEvent(EventTemplate event) {
-        busService.send(event);
+    public static void sendEvent(EventTemplate event) {
+        //
     }
 
     // FIXME This shouldn't be done through this method
-
     /**
      *
      * @param command
      * @return
      */
-        public static Command sendCommand(final Command command) {
-        return busService.send(command);
+    public static Command sendCommand(final Command command) {
+        return null;
     }
 
     /**
@@ -520,8 +504,10 @@ public class Freedomotic implements BusConsumer {
         LOG.info("Freedomotic instance ID: " + INSTANCE_ID);
 
         try {
-            Freedomotic freedomotic = INJECTOR.getInstance(Freedomotic.class);
-            //start freedomotic
+            AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+            context.register(SpringConfig.class);
+            context.refresh();
+            Freedomotic freedomotic = (Freedomotic) context.getBean("freedomotic");
             freedomotic.start();
         } catch (FreedomoticException ex) {
             LOG.severe(ex.getMessage());
@@ -593,15 +579,15 @@ public class Freedomotic implements BusConsumer {
         ReactionPersistence.saveReactions(new File(savedDataRoot + "/rea"));
 
         //save the environment
-        String environmentFilePath =
-                Info.getApplicationPath() + "/data/furn/" + config.getProperty("KEY_ROOM_XML_PATH");
+        String environmentFilePath
+                = Info.getApplicationPath() + "/data/furn/" + config.getProperty("KEY_ROOM_XML_PATH");
         File folder = null;
 
         try {
             folder = new File(environmentFilePath).getParentFile();
-            
+
             EnvironmentPersistence.saveEnvironmentsToFolder(folder);
-            
+
             if (config.getBooleanProperty("KEY_OVERRIDE_OBJECTS_ON_EXIT", false) == true) {
                 File saveDir = null;
                 try {

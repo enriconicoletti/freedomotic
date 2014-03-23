@@ -1,22 +1,20 @@
 /**
  *
- * Copyright (c) 2009-2013 Freedomotic team
- * http://freedomotic.com
+ * Copyright (c) 2009-2013 Freedomotic team http://freedomotic.com
  *
  * This file is part of Freedomotic
  *
- * This Program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * This Program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2, or (at your option) any later version.
  *
- * This Program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This Program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Freedomotic; see the file COPYING.  If not, see
+ * You should have received a copy of the GNU General Public License along with
+ * Freedomotic; see the file COPYING. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 //Copyright 2009 Enrico Nicoletti
@@ -43,29 +41,54 @@ import com.freedomotic.model.geometry.FreedomPolygon;
 import com.freedomotic.model.object.EnvObject;
 import java.io.Serializable;
 import java.util.ArrayList;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author enrico
  */
-public class Zone
-        implements Serializable {
+@SuppressWarnings("serial")
+@javax.persistence.Entity
+@Table(name = "zone")
+@Transactional
+public class Zone implements Serializable {
 
     private static final long serialVersionUID = 4668625650384850879L;
-	
-	private String name;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @Column
+    private String name;
+    @Column
     private String description;
-    private boolean room;
+    @Column
+    private Boolean room;
+    @OneToOne(cascade = {CascadeType.ALL})
     private FreedomPolygon shape;
-    private ArrayList<EnvObject> objects;
+    @Transient
+    private List<EnvObject> objects;
+    @Column
     private String texture;
+    @ManyToOne
+    @JoinColumn(name="environment_id")
+    private Environment environment;
 
     /**
      *
      * @return
      */
-    @RequiresPermissions("zones:read")
     public String getName() {
         return this.name;
     }
@@ -74,7 +97,6 @@ public class Zone
      *
      * @return
      */
-    @RequiresPermissions("zones:read")
     public FreedomPolygon getShape() {
         return this.shape;
     }
@@ -83,25 +105,6 @@ public class Zone
      *
      * @return
      */
-    @RequiresPermissions("zones:read")
-    public boolean isRoom() {
-        return room;
-    }
-
-    /**
-     *
-     * @param room
-     */
-    @RequiresPermissions("zones:update")
-    public void setAsRoom(boolean room) {
-        this.room = room;
-    }
-
-    /**
-     *
-     * @return
-     */
-    @RequiresPermissions("zones:read")
     public String getDescription() {
         if (description == null) {
             description = "";
@@ -114,7 +117,6 @@ public class Zone
      *
      * @param description
      */
-    @RequiresPermissions("zones:update")
     public void setDescription(String description) {
         this.description = description;
     }
@@ -123,7 +125,6 @@ public class Zone
      *
      * @return
      */
-    @RequiresPermissions("zones:read")
     public String getTexture() {
         return texture;
     }
@@ -132,7 +133,6 @@ public class Zone
      *
      * @param name
      */
-    @RequiresPermissions("zones:update")
     public void setName(String name) {
         this.name = name;
     }
@@ -141,7 +141,6 @@ public class Zone
      *
      * @param shape
      */
-    @RequiresPermissions("zones:update")
     public void setShape(FreedomPolygon shape) {
         this.shape = shape;
     }
@@ -159,20 +158,15 @@ public class Zone
      *
      * @param file
      */
-    @RequiresPermissions("zones:update")
     public void setTexture(String file) {
-
         this.texture = file;
-
-        //file.getName();
     }
 
     /**
      *
      * @return
      */
-    @RequiresPermissions("zones:read")
-    public ArrayList<EnvObject> getObjects() {
+    public List<EnvObject> getObjects() {
         if (objects == null) {
             objects = new ArrayList<EnvObject>();
         }
@@ -184,7 +178,6 @@ public class Zone
      *
      * @param objects
      */
-    @RequiresPermissions("zones:update")
     public void setObjects(ArrayList<EnvObject> objects) {
         this.objects = objects;
     }
@@ -207,7 +200,6 @@ public class Zone
      * @return
      */
     @Override
-    @RequiresPermissions("zones:read")
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -231,11 +223,40 @@ public class Zone
      * @return
      */
     @Override
-    @RequiresPermissions("zones:read")
     public int hashCode() {
         int hash = 5;
         hash = (17 * hash) + ((this.name != null) ? this.name.hashCode() : 0);
 
         return hash;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Environment getEnvironment() {
+        return environment;
+    }
+
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
+
+    public Boolean isRoom() {
+        return room;
+    }
+
+    public void setRoom(Boolean room) {
+        this.room = room;
+    }
+
+    @Deprecated
+    public void setAsRoom(boolean b) {
+        setRoom(b);
+    }
+
 }

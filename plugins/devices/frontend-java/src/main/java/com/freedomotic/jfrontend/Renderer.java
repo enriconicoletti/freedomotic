@@ -702,7 +702,7 @@ public class Renderer
     protected EnvObjectLogic mouseOnObject(Point p) {
         Point mousePointer = toRealCoords(p);
 
-        for (EnvObjectLogic logic : EnvObjectPersistence.getObjectByEnvironment(getCurrEnv().getPojo().getUUID())) {
+        for (EnvObjectLogic logic : EnvObjectPersistence.getObjectByEnvironment(getCurrEnv().getPojo().getUuid())) {
             if (getCachedShape(logic).contains(mousePointer)) {
                 return logic;
             }
@@ -775,7 +775,7 @@ public class Renderer
     }
 
     private void rebuildShapesCache() {
-        for (EnvObjectLogic obj : EnvObjectPersistence.getObjectByEnvironment(getCurrEnv().getPojo().getUUID())) {
+        for (EnvObjectLogic obj : EnvObjectPersistence.getObjectByEnvironment(getCurrEnv().getPojo().getUuid())) {
             rebuildShapeCache(obj);
         }
     }

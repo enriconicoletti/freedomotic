@@ -1,22 +1,20 @@
 /**
  *
- * Copyright (c) 2009-2013 Freedomotic team
- * http://freedomotic.com
+ * Copyright (c) 2009-2013 Freedomotic team http://freedomotic.com
  *
  * This file is part of Freedomotic
  *
- * This Program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * This Program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2, or (at your option) any later version.
  *
- * This Program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This Program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Freedomotic; see the file COPYING.  If not, see
+ * You should have received a copy of the GNU General Public License along with
+ * Freedomotic; see the file COPYING. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 //Copyright 2009 Enrico Nicoletti
@@ -43,55 +41,78 @@ import com.freedomotic.model.geometry.FreedomColor;
 import com.freedomotic.model.geometry.FreedomPolygon;
 import java.io.Serializable;
 import java.util.ArrayList;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author enrico
  */
-public class Environment
-        implements Serializable {
+@SuppressWarnings("serial")
+@javax.persistence.Entity
+@Table(name = "environment")
+@Transactional
+public class Environment implements Serializable {
 
     private static final long serialVersionUID = 2461804483322891608L;
-	
-	private String name;
-    private int width;
-    private int height;
-    private String renderer;
-    private FreedomColor backgroundColor;
-    private String backgroundImage;
-    private ArrayList<Zone> zones = new ArrayList<Zone>();
-    private String uuid;
 
-    /**
-     *
-     */
-    public Environment() {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @Column
+    private String uuid;
+    @Column
+    private String name;
+    @Column
+    private int width;
+    @Column
+    private int height;
+    @Column
+    private String renderer;
+    @Column
+    private FreedomColor backgroundColor;
+    @Column
+    private String backgroundImage;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "environment", cascade = {CascadeType.ALL})
+    private List<Zone> zones = new ArrayList<Zone>();
+
+    public Long getId() {
+        return id;
     }
 
-    /**
-     *
-     * @return
-     */
-    @RequiresPermissions("environments:read")
-    public String getUUID() {
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+
+    public String getUuid() {
         return this.uuid;
     }
 
-    /**
-     *
-     * @param uuid
-     */
-    @RequiresPermissions("environments:update")
-    public void setUUID(String uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+    
+    public String getUUID() {
+        return this.getUuid();
+    }
+
+    public void setUUID(String uuid) {
+        this.setUuid(uuid);
     }
 
     /**
      *
      * @return
      */
-    @RequiresPermissions("environments:read")
     public String getRenderer() {
         return renderer;
     }
@@ -100,7 +121,6 @@ public class Environment
      *
      * @param renderer
      */
-    @RequiresPermissions("environments:update")
     public void setRenderer(String renderer) {
         this.renderer = renderer;
     }
@@ -109,7 +129,6 @@ public class Environment
      *
      * @return
      */
-    @RequiresPermissions("environments:read")
     public String getEnvironmentName() {
         return name;
     }
@@ -119,7 +138,6 @@ public class Environment
      * @return
      */
     @Override
-    @RequiresPermissions("environments:read")
     public String toString() {
         return name;
     }
@@ -128,7 +146,6 @@ public class Environment
      *
      * @return
      */
-    @RequiresPermissions("environments:read")
     public FreedomPolygon getShape() {
         //it returns the first zone in the environment. It is considered the Indoor
         return zones.get(0).getShape();
@@ -138,7 +155,6 @@ public class Environment
      *
      * @return
      */
-    @RequiresPermissions("environments:read")
     public FreedomColor getBackgroundColor() {
         return backgroundColor;
     }
@@ -147,7 +163,6 @@ public class Environment
      *
      * @return
      */
-    @RequiresPermissions("environments:read")
     public String getBackgroundImage() {
         if (backgroundImage == null) {
             return "environment-map.png";
@@ -160,7 +175,6 @@ public class Environment
      *
      * @param backgroundImage
      */
-    @RequiresPermissions("environments:update")
     public void setBackgroundImage(String backgroundImage) {
         this.backgroundImage = backgroundImage;
     }
@@ -169,7 +183,6 @@ public class Environment
      *
      * @return
      */
-    @RequiresPermissions("environments:read")
     public String getName() {
         return name;
     }
@@ -178,7 +191,6 @@ public class Environment
      *
      * @param name
      */
-    @RequiresPermissions("environments:update")
     public void setName(String name) {
         this.name = name;
     }
@@ -188,7 +200,6 @@ public class Environment
      * @param index
      * @return
      */
-    @RequiresPermissions("environments:read,zones:read")
     public Zone getZone(int index) {
         return zones.get(index);
     }
@@ -197,8 +208,7 @@ public class Environment
      *
      * @return
      */
-    @RequiresPermissions("environments:read,zones:read")
-    public ArrayList<Zone> getZones() {
+    public List<Zone> getZones() {
         return zones;
     }
 
@@ -206,7 +216,6 @@ public class Environment
      *
      * @return
      */
-    @RequiresPermissions("environments:read,zones:read")
     public int getLastZoneIndex() {
         return zones.size();
     }
@@ -215,7 +224,6 @@ public class Environment
      *
      * @return
      */
-    @RequiresPermissions("environments:read")
     public int getWidth() {
         return width;
     }
@@ -224,7 +232,6 @@ public class Environment
      *
      * @return
      */
-    @RequiresPermissions("environments:read")
     public int getHeight() {
         return height;
     }
@@ -232,10 +239,29 @@ public class Environment
     /**
      *
      */
-    @RequiresPermissions("environments:update")
     public void clear() {
         zones.clear();
         zones = null;
         backgroundColor = null;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setBackgroundColor(FreedomColor backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
+    public void setZones(ArrayList<Zone> zones) {
+        this.zones = zones;
+    }
+
+    public void addZone(Zone zone) {
+        zones.add(zone);
     }
 }

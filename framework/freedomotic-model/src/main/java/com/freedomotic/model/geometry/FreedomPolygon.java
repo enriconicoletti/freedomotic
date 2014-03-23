@@ -1,46 +1,59 @@
 /**
  *
- * Copyright (c) 2009-2013 Freedomotic team
- * http://freedomotic.com
+ * Copyright (c) 2009-2013 Freedomotic team http://freedomotic.com
  *
  * This file is part of Freedomotic
  *
- * This Program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * This Program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2, or (at your option) any later version.
  *
- * This Program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This Program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Freedomotic; see the file COPYING.  If not, see
+ * You should have received a copy of the GNU General Public License along with
+ * Freedomotic; see the file COPYING. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package com.freedomotic.model.geometry;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.ElementCollection;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author Enrico
  */
-public class FreedomPolygon
-        implements FreedomShape,
-        Serializable {
+@SuppressWarnings("serial")
+@javax.persistence.Entity
+@Table(name = "polygon")
+@Transactional
+public class FreedomPolygon implements FreedomShape, Serializable {
 
     private static final long serialVersionUID = -3740479951903880574L;
-	
-    private ArrayList<FreedomPoint> points = new ArrayList<FreedomPoint>();
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @ElementCollection
+    private List<FreedomPoint> points = new ArrayList<FreedomPoint>();
 
     /**
      *
      */
     public FreedomPolygon() {
     }
+    
+    
 
     /**
      *
@@ -77,8 +90,8 @@ public class FreedomPolygon
         }
 
         if ((currentPoint != null) && (nextPoint != null)) {
-            int x = (int) Math.abs((currentPoint.getX() - nextPoint.getX())) / 2;
-            int y = (int) Math.abs((currentPoint.getY() - nextPoint.getY())) / 2;
+            int x = Math.abs((currentPoint.getX() - nextPoint.getX())) / 2;
+            int y = Math.abs((currentPoint.getY() - nextPoint.getY())) / 2;
             FreedomPoint newPoint = new FreedomPoint(x, y);
             points.add(index + 1, newPoint);
 
@@ -100,7 +113,7 @@ public class FreedomPolygon
      *
      * @return
      */
-    public ArrayList<FreedomPoint> getPoints() {
+    public List<FreedomPoint> getPoints() {
         if (points != null) {
             return points;
         } else {
@@ -122,5 +135,17 @@ public class FreedomPolygon
         }
 
         return buff.toString();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setPoints(List<FreedomPoint> points) {
+        this.points = points;
     }
 }

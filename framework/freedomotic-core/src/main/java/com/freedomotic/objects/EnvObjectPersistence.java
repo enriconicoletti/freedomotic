@@ -115,7 +115,7 @@ public class EnvObjectPersistence {
                 if ((envObject.getPojo().getEnvironmentID() == null)
                         || envObject.getPojo().getEnvironmentID().isEmpty()) {
                     envObject.getPojo()
-                            .setEnvironmentID(EnvironmentPersistence.getEnvironments().get(0).getPojo().getUUID());
+                            .setEnvironmentID(EnvironmentPersistence.getEnvironments().get(0).getPojo().getUuid());
                 }
 
                 String fileName = envObject.getPojo().getUUID() + ".xobj";
@@ -281,7 +281,7 @@ public class EnvObjectPersistence {
     public static EnvObjectLogic getObjectByName(String name) {
         for (Iterator<EnvObjectLogic> it = EnvObjectPersistence.iterator(); it.hasNext();) {
             EnvObjectLogic object = it.next();
-            if (object.getPojo().getName().equalsIgnoreCase(name) //&& auth.isPermitted("objects:read:" + object.getPojo().getUUID())
+            if (object.getPojo().getName().equalsIgnoreCase(name) //&& auth.isPermitted("objects:read:" + object.getPojo().getUuid())
                     ) {
                 return object;
             }
@@ -359,7 +359,7 @@ public class EnvObjectPersistence {
         for (Iterator<EnvObjectLogic> it = EnvObjectPersistence.iterator(); it.hasNext();) {
             EnvObjectLogic object = it.next();
             if ((object.getPojo().getProtocol().equalsIgnoreCase(protocol.trim()))
-                    && (object.getPojo().getPhisicalAddress().equalsIgnoreCase(address.trim())) //           && auth.isPermitted("objects:read:" + object.getPojo().getUUID())
+                    && (object.getPojo().getPhisicalAddress().equalsIgnoreCase(address.trim())) //           && auth.isPermitted("objects:read:" + object.getPojo().getUuid())
                     ) {
                 list.add(object);
             }
@@ -384,7 +384,7 @@ public class EnvObjectPersistence {
         ArrayList<EnvObjectLogic> list = new ArrayList<EnvObjectLogic>();
         for (Iterator<EnvObjectLogic> it = EnvObjectPersistence.iterator(); it.hasNext();) {
             EnvObjectLogic object = it.next();
-            if (object.getPojo().getProtocol().equalsIgnoreCase(protocol.trim()) // && auth.isPermitted("objects:read:" + object.getPojo().getUUID())
+            if (object.getPojo().getProtocol().equalsIgnoreCase(protocol.trim()) // && auth.isPermitted("objects:read:" + object.getPojo().getUuid())
                     ) {
                 list.add(object);
             }
@@ -404,7 +404,7 @@ public class EnvObjectPersistence {
         ArrayList<EnvObjectLogic> list = new ArrayList<EnvObjectLogic>();
         for (Iterator<EnvObjectLogic> it = EnvObjectPersistence.iterator(); it.hasNext();) {
             EnvObjectLogic object = it.next();
-            if (object.getPojo().getEnvironmentID().equalsIgnoreCase(uuid) //&& auth.isPermitted("objects:read:" + object.getPojo().getUUID().substring(0, 7))
+            if (object.getPojo().getEnvironmentID().equalsIgnoreCase(uuid) //&& auth.isPermitted("objects:read:" + object.getPojo().getUuid().substring(0, 7))
                     ) {
                 list.add(object);
             }

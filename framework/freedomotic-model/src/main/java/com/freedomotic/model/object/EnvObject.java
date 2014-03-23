@@ -1,26 +1,25 @@
 /**
  *
- * Copyright (c) 2009-2013 Freedomotic team
- * http://freedomotic.com
+ * Copyright (c) 2009-2013 Freedomotic team http://freedomotic.com
  *
  * This file is part of Freedomotic
  *
- * This Program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * This Program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2, or (at your option) any later version.
  *
- * This Program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This Program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Freedomotic; see the file COPYING.  If not, see
+ * You should have received a copy of the GNU General Public License along with
+ * Freedomotic; see the file COPYING. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package com.freedomotic.model.object;
 
+import com.freedomotic.model.environment.Environment;
 import com.freedomotic.model.geometry.FreedomShape;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,48 +27,115 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author nicoletti
  */
+@SuppressWarnings("serial")
+@javax.persistence.Entity
+@Table(name = "object")
+@Transactional
 public class EnvObject implements Serializable {
 
     private static final long serialVersionUID = -7253889516478184321L;
-	
-	private String name;
-    private String description;
-    private String actAs;
-    private String type;
-    private String uuid;
-    private String hierarchy;
-    private String protocol;
-    private String phisicalAddress;
-    private List<Behavior> behaviors;
-    private List<Representation> representation ; //= new ArrayList<Representation>();
-    private Set<String> tags;
-    private Properties actions;
-    private Properties triggers;
-    private int currentRepresentation;
-    private String envUUID;
 
-    /**
-     *
-     * @return
-     */
-    @RequiresPermissions("objects:read")
-    public String getEnvironmentID() {
-        return this.envUUID;
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
     }
 
-    /**
-     *
-     * @param uuid
-     */
-    @RequiresPermissions("objects:update")
-    public void setEnvironmentID(String uuid) {
-        this.envUUID = uuid;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @Column
+    private String name;
+    @Column
+    private String description;
+    @Column
+    private String actAs;
+    @Column
+    private String type;
+    @Column
+    private String uuid;
+    @Column
+    private String hierarchy;
+    @Column
+    private String protocol;
+    @Column
+    private String phisicalAddress;
+    @OneToMany(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "behavior_id")
+    private List<Behavior> behaviors;
+    @OneToMany
+    @JoinColumn(name = "representation_id")
+    private List<Representation> representation;
+    @ElementCollection
+    private Set<String> tags;
+    @Column
+    private Properties actions;
+    @Column
+    private Properties triggers;
+    @Column
+    private int currentRepresentation;
+    //@OneToOne
+    //private Environment environment;
+    @Column
+    private String envUUID;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public List<Representation> getRepresentation() {
+        return representation;
+    }
+
+    public void setRepresentation(List<Representation> representation) {
+        this.representation = representation;
+    }
+
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
+    }
+
+    public void setBehaviors(List<Behavior> behaviors) {
+        this.behaviors = behaviors;
+    }
+
+    public void setActions(Properties actions) {
+        this.actions = actions;
+    }
+
+    public void setTriggers(Properties triggers) {
+        this.triggers = triggers;
     }
 
     /**
@@ -425,43 +491,61 @@ public class EnvObject implements Serializable {
     public String toString() {
         return getName();
     }
-    
+
     /**
      *
      * @return
      */
     @RequiresPermissions("objects:read")
-    public Set<String> getTagsList(){
+    public Set<String> getTagsList() {
         return this.tags;
     }
-    
+
     /**
      *
      * @return
      */
-    @RequiresPermissions("objects:read")       
-    public String getTagsString(){
+    @RequiresPermissions("objects:read")
+    public String getTagsString() {
         StringBuilder tagString = new StringBuilder();
         Boolean morethanone = false;
-        for (String tag : getTagsList()){
-            if (tag.trim() != ""){
-            if (morethanone){
-                tagString.append(",");
-            }
-            tagString.append(tag.trim());
-            morethanone = true;
+        for (String tag : getTagsList()) {
+            if (tag.trim() != "") {
+                if (morethanone) {
+                    tagString.append(",");
+                }
+                tagString.append(tag.trim());
+                morethanone = true;
             }
         }
         return tagString.toString();
     }
-       
+
     /**
      *
      */
-    public void initTags(){
-        if (this.tags == null){
+    public void initTags() {
+        if (this.tags == null) {
             this.tags = new HashSet();
         }
     }
-    
+
+    @Deprecated
+    public String getEnvironmentID() {
+        return this.getEnvUUID();
+    }
+
+    @Deprecated
+    public void setEnvironmentID(String uuid) {
+        this.setEnvUUID(uuid);
+    }
+
+    public String getEnvUUID() {
+        return envUUID;
+    }
+
+    public void setEnvUUID(String envUUID) {
+        this.envUUID = envUUID;
+    }
+
 }

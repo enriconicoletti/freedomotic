@@ -302,7 +302,7 @@ public class EnvObjectLogic {
      */
     @RequiresPermissions("objects:read")
     public EnvObject getPojo() {
-       // if (pojo.getUUID() == null  || auth.isPermitted("objects:read:" + pojo.getUUID().substring(0, 5))
+       // if (pojo.getUuid() == null  || auth.isPermitted("objects:read:" + pojo.getUuid().substring(0, 5))
        //         ) {
             return pojo;
       //  }
@@ -551,7 +551,7 @@ public class EnvObjectLogic {
     protected void setPojo(EnvObject pojo) {
         if (((pojo.getEnvironmentID() == null) || pojo.getEnvironmentID().isEmpty())
                 && (EnvironmentPersistence.getEnvironments().size() > 0)) {
-            pojo.setEnvironmentID(EnvironmentPersistence.getEnvironments().get(0).getPojo().getUUID());
+            pojo.setEnvironmentID(EnvironmentPersistence.getEnvironments().get(0).getPojo().getUuid());
         }
 
         this.pojo = pojo;
@@ -625,7 +625,7 @@ public class EnvObjectLogic {
                     + "null for object " + getPojo().getName());
         }
         this.environment = selEnv;
-        getPojo().setEnvironmentID(selEnv.getPojo().getUUID());
+        getPojo().setEnvironmentID(selEnv.getPojo().getUuid());
     }
 
     /**

@@ -1159,7 +1159,7 @@ private void jCheckBoxMarketActionPerformed(java.awt.event.ActionEvent evt) {//G
                     if (!folder.getName().isEmpty()) {
                         EnvironmentLogic newenv = EnvironmentPersistence.getEnvironments().get(0);
                         newenv.setSource(
-                                new File(folder + "/" + newenv.getPojo().getUUID() + ".xenv"));
+                                new File(folder + "/" + newenv.getPojo().getUuid() + ".xenv"));
                         setEnvironment(newenv);
                         //save the new environment
                         EnvironmentPersistence.saveAs(newenv, folder);
@@ -1233,8 +1233,8 @@ private void jCheckBoxMarketActionPerformed(java.awt.event.ActionEvent evt) {//G
         EnvironmentLogic newEnv = EnvironmentPersistence.add(drawer.getCurrEnv(), true);
         String input = JOptionPane.showInputDialog(I18n.msg("enter_new_name_for_env") + newEnv.getPojo().getName());
         newEnv.getPojo().setName(input.trim());
-        newEnv.setSource(new File(drawer.getCurrEnv().getSource().getParentFile() + "/" + newEnv.getPojo().getUUID() + ".xenv"));
-        setEnvironment(EnvironmentPersistence.getEnvByUUID(newEnv.getPojo().getUUID()));
+        newEnv.setSource(new File(drawer.getCurrEnv().getSource().getParentFile() + "/" + newEnv.getPojo().getUuid() + ".xenv"));
+        setEnvironment(EnvironmentPersistence.getEnvByUUID(newEnv.getPojo().getUuid()));
         checkDeletableEnvironments();
     }//GEN-LAST:event_mnuAddDuplicateEnvironmentActionPerformed
 
@@ -1267,7 +1267,7 @@ private void jCheckBoxMarketActionPerformed(java.awt.event.ActionEvent evt) {//G
           if (envCombo.getSelectedItem() instanceof EnvironmentLogic) {
                 // assign objects to new environment
                 EnvironmentLogic env = (EnvironmentLogic) envCombo.getSelectedItem();
-                for (EnvObjectLogic obj : EnvObjectPersistence.getObjectByEnvironment(oldenv.getPojo().getUUID())) {
+                for (EnvObjectLogic obj : EnvObjectPersistence.getObjectByEnvironment(oldenv.getPojo().getUuid())) {
                     obj.setEnvironment(env);
                 }
                 setEnvironment(env);

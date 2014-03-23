@@ -12,6 +12,8 @@ import com.freedomotic.objects.EnvObjectLogic;
 import com.freedomotic.objects.EnvObjectPersistence;
 import com.freedomotic.plugins.ClientStorage;
 import com.freedomotic.plugins.filesystem.PluginsManager;
+import com.freedomotic.plugins.filesystem.PluginsManagerImpl;
+import com.freedomotic.reactions.TriggerPersistence;
 import com.freedomotic.security.Auth;
 import com.freedomotic.util.I18n.I18n;
 import com.google.inject.Inject;
@@ -19,6 +21,7 @@ import com.google.inject.Singleton;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implements the standard freedomotic APIs available to plugins. This class
@@ -33,13 +36,22 @@ import java.util.List;
 public class APIStandardImpl
         implements API {
 
-    private final EnvironmentPersistence environment;
-    private final EnvObjectPersistence object;
-    private final ClientStorage clientStorage;
-    private final AppConfig config;
-    private final Auth auth;
-    private final I18n i18n;
-    private final PluginsManager plugManager;
+    private EnvObjectPersistence object = new EnvObjectPersistence();
+    @Autowired
+    private ClientStorage clientStorage;
+    @Autowired
+    private AppConfig config;
+    @Autowired
+    private Auth auth;
+    @Autowired
+    private I18n i18n;
+    @Autowired
+    private PluginsManager plugManager;
+    private EnvironmentPersistence environment = new EnvironmentPersistence(clientStorage);
+
+    public APIStandardImpl() {
+
+    }
 
     /**
      *
@@ -97,6 +109,7 @@ public class APIStandardImpl
     @Override
     public Collection<EnvObjectLogic> getObjectList() {
         return /*Collections.unmodifiableList(*/ object.getObjectList(); /*);*/
+
     }
 
     /**
@@ -207,7 +220,7 @@ public class APIStandardImpl
     public Collection<Client> getClients(String filter) {
         return clientStorage.getClients(filter);
     }
-    
+
     /**
      *
      * @return
@@ -229,13 +242,13 @@ public class APIStandardImpl
     public ClientStorage getClientStorage() {
         return clientStorage;
     }
-    
+
     /**
      *
      * @return
      */
     @Override
-    public Auth getAuth(){
+    public Auth getAuth() {
         return auth;
     }
 

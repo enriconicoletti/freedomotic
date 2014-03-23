@@ -51,7 +51,7 @@ public class EnvironmentDAOXstream
     private boolean savedAsNewEnvironment;
 
     @Inject
-    EnvironmentDAOXstream(@Assisted File directory) {
+    public EnvironmentDAOXstream(@Assisted File directory) {
         this.directory = directory;
     }
 
@@ -99,13 +99,13 @@ public class EnvironmentDAOXstream
                 //print an header for the index.txt file
                 summary.append("#Filename \t\t #EnvName").append("\n");
 
-                String uuid = environment.getUUID();
+                String uuid = environment.getUuid();
 
                 if ((uuid == null) || uuid.isEmpty()) {
-                    environment.setUUID(UUID.randomUUID().toString());
+                    environment.setUuid(UUID.randomUUID().toString());
                 }
 
-                String fileName = environment.getUUID() + ".xenv";
+                String fileName = environment.getUuid() + ".xenv";
                 serialize(environment,
                         new File(directory + "/" + fileName));
                 summary.append(fileName).append("\t").append(environment.getName()).append("\n");

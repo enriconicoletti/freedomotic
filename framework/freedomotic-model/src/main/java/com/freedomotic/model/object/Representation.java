@@ -1,22 +1,20 @@
 /**
  *
- * Copyright (c) 2009-2013 Freedomotic team
- * http://freedomotic.com
+ * Copyright (c) 2009-2013 Freedomotic team http://freedomotic.com
  *
  * This file is part of Freedomotic
  *
- * This Program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * This Program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2, or (at your option) any later version.
  *
- * This Program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This Program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Freedomotic; see the file COPYING.  If not, see
+ * You should have received a copy of the GNU General Public License along with
+ * Freedomotic; see the file COPYING. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package com.freedomotic.model.object;
@@ -24,27 +22,58 @@ package com.freedomotic.model.object;
 import com.freedomotic.model.geometry.FreedomPoint;
 import com.freedomotic.model.geometry.FreedomShape;
 import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author Enrico
  */
-public class Representation
-        implements Serializable {
+@SuppressWarnings("serial")
+@javax.persistence.Entity
+@Table(name = "representation")
+@Transactional
+public class Representation implements Serializable {
 
     private static final long serialVersionUID = 5024359210563760316L;
-	
-	private boolean tangible;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @Column
+    private boolean tangible;
+    @Column
     private boolean intersecable;
+    @Column
     private FreedomPoint offset;
+    @Column
     private double rotation;
+    @Column
     private String icon;
+    @Column
     private String fillColor;
+    @Column
     private String textColor;
+    @Column
     private String borderColor;
+    @Column
     private double scaleX;
+    @Column
     private double scaleY;
+    @Column
     private FreedomShape shape;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     /**
      *

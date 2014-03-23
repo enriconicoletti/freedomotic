@@ -120,7 +120,7 @@ public class PlainDrawer
      */
     @Override
     public void renderObjects() {
-        for (EnvObjectLogic obj : EnvObjectPersistence.getObjectByEnvironment(getCurrEnv().getPojo().getUUID())) {
+        for (EnvObjectLogic obj : EnvObjectPersistence.getObjectByEnvironment(getCurrEnv().getPojo().getUuid())) {
             if (obj != null) {
                 setTransformContextFor(obj.getPojo());
                 drawPlainObject(obj);

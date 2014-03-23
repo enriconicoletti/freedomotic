@@ -1,22 +1,20 @@
 /**
  *
- * Copyright (c) 2009-2013 Freedomotic team
- * http://freedomotic.com
+ * Copyright (c) 2009-2013 Freedomotic team http://freedomotic.com
  *
  * This file is part of Freedomotic
  *
- * This Program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * This Program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2, or (at your option) any later version.
  *
- * This Program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This Program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Freedomotic; see the file COPYING.  If not, see
+ * You should have received a copy of the GNU General Public License along with
+ * Freedomotic; see the file COPYING. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 /*
@@ -26,35 +24,50 @@
 package com.freedomotic.model.object;
 
 import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.MappedSuperclass;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author Enrico
  */
-public abstract class Behavior
-        implements Serializable {
+@SuppressWarnings("serial")
+//@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "class", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("behavior")
+@Transactional
+public abstract class Behavior implements Serializable {
 
     private static final long serialVersionUID = -4973746059396782383L;
-	
-	private String name;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @Column
+    private String name;
+    @Column
     private String description;
+    @Column
     private boolean active;
+    @Column
     private int priority;
+    @Column
     private boolean readOnly;
 
-    /**
-     *
-     */
     public final static String VALUE_OPPOSITE = "opposite";
-
-    /**
-     *
-     */
     public final static String VALUE_NEXT = "next";
-
-    /**
-     *
-     */
     public final static String VALUE_PREVIOUS = "previous";
 
     /**
@@ -64,7 +77,7 @@ public abstract class Behavior
     public boolean isActive() {
         return active;
     }
-
+    
     /**
      *
      * @param active
@@ -171,5 +184,13 @@ public abstract class Behavior
         hash = (11 * hash) + ((this.name != null) ? this.name.hashCode() : 0);
 
         return hash;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

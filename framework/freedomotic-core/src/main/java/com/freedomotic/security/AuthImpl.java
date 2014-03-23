@@ -44,6 +44,7 @@ import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.support.SubjectThreadState;
 import org.apache.shiro.util.ThreadState;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -58,7 +59,7 @@ public class AuthImpl implements Auth{
     private SimpleAccountRealm pluginRealm = new SimpleAccountRealm(PLUGIN_REALM_NAME);
     private String DEFAULT_PERMISSION = "*";
     private ArrayList<Realm> realmCollection = new ArrayList<Realm>();
-    @Inject AppConfig config;
+    @Autowired AppConfig config;
     
     /**
      *

@@ -96,13 +96,13 @@ public final class EnvironmentPersistence {
             summary.append("#Filename \t\t #EnvName").append("\n");
 
             for (EnvironmentLogic environment : environments) {
-                String uuid = environment.getPojo().getUUID();
+                String uuid = environment.getPojo().getUuid();
 
                 if ((uuid == null) || uuid.isEmpty()) {
-                    environment.getPojo().setUUID(UUID.randomUUID().toString());
+                    environment.getPojo().setUuid(UUID.randomUUID().toString());
                 }
 
-                String fileName = environment.getPojo().getUUID() + ".xenv";
+                String fileName = environment.getPojo().getUuid() + ".xenv";
                 save(environment,
                         new File(folder + "/" + fileName));
                 summary.append(fileName).append("\t").append(environment.getPojo().getName()).append("\n");
@@ -223,7 +223,7 @@ public final class EnvironmentPersistence {
             //defensive copy to not affect the passed object with the changes
             Environment pojoCopy = SerialClone.clone(obj.getPojo());
             pojoCopy.setName(obj.getPojo().getName() + "-" + UidGenerator.getNextStringUid());
-            pojoCopy.setUUID(""); // force to assign a new random and unique UUID
+            pojoCopy.setUuid(""); // force to assign a new random and unique UUID
             //should be the last called after using setters on envLogic.getPojo()
             envLogic.setPojo(pojoCopy);
         }
@@ -316,7 +316,7 @@ public final class EnvironmentPersistence {
      * @param input
      */
     public static void remove(EnvironmentLogic input) {
-        for (EnvObjectLogic obj : EnvObjectPersistence.getObjectByEnvironment(input.getPojo().getUUID())) {
+        for (EnvObjectLogic obj : EnvObjectPersistence.getObjectByEnvironment(input.getPojo().getUuid())) {
             EnvObjectPersistence.remove(obj);
         }
 
@@ -395,7 +395,7 @@ public final class EnvironmentPersistence {
         createFolderStructure(folder);
 
         save(env,
-                new File(folder + "/" + env.getPojo().getUUID() + ".xenv"));
+                new File(folder + "/" + env.getPojo().getUuid() + ".xenv"));
 
         //TODO: Freedomotic.environment.getPojo().setObjectsFolder()
         //  EnvObjectPersistence.saveObjects(new File(folder + "/objects"));
@@ -460,7 +460,7 @@ public final class EnvironmentPersistence {
     public static EnvironmentLogic getEnvByUUID(String UUID) {
         //     if (auth.isPermitted("environments:read:" + UUID)) {
         for (EnvironmentLogic env : environments) {
-            if (env.getPojo().getUUID().equals(UUID)) {
+            if (env.getPojo().getUuid().equals(UUID)) {
                 return env;
             }
         }

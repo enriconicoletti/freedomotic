@@ -44,7 +44,7 @@ public class ImageDrawer
      */
     @Override
     public void renderObjects() {
-        for (EnvObjectLogic obj : EnvObjectPersistence.getObjectByEnvironment(getCurrEnv().getPojo().getUUID())) {
+        for (EnvObjectLogic obj : EnvObjectPersistence.getObjectByEnvironment(getCurrEnv().getPojo().getUuid())) {
             renderSingleObject(obj);
         }
     }

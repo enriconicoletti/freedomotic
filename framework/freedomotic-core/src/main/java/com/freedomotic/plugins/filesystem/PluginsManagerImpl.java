@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * An helper class that uses an internal DAO pattern to loadBoundle plugins of
@@ -40,13 +41,11 @@ import java.util.logging.Logger;
 public class PluginsManagerImpl implements PluginsManager {
     //depedencies
 
-    private ClientStorage clientStorage;
-    private TriggerPersistence triggers;
+    @Autowired private ClientStorage clientStorage;
+    @Autowired private TriggerPersistence triggers;
 
     @Inject
-    PluginsManagerImpl(ClientStorage clientStorage, TriggerPersistence triggers) {
-        this.clientStorage = clientStorage;
-        this.triggers = triggers;
+    public PluginsManagerImpl() {
     }
 
     /**

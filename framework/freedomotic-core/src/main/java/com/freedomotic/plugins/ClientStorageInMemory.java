@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 /**
  * A storage of loaded plugins and connected clients
@@ -43,6 +45,8 @@ import java.util.logging.Logger;
 public final class ClientStorageInMemory implements ClientStorage {
 
     private final List<Client> clients = new ArrayList<Client>();
+    
+
 
     /**
      *
@@ -61,6 +65,7 @@ public final class ClientStorageInMemory implements ClientStorage {
             if (isCompatible(c)) {
                 //force injection as this class is not built by guice
                 Freedomotic.INJECTOR.injectMembers(c);
+
                 clients.add(c);
             } else {
                 Client client =

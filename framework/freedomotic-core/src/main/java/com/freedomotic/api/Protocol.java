@@ -20,6 +20,7 @@
 package com.freedomotic.api;
 
 import com.freedomotic.app.Freedomotic;
+import com.freedomotic.app.SpringConfig;
 import com.freedomotic.bus.BusConsumer;
 import com.freedomotic.bus.BusMessagesListener;
 import com.freedomotic.bus.BusService;
@@ -32,6 +33,8 @@ import java.util.logging.Logger;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * Uses a Template Method pattern which allows subclass to define how to perform
@@ -47,6 +50,7 @@ public abstract class Protocol
     private BusMessagesListener listener;
     private Protocol.SensorThread sensorThread;
     private volatile Destination lastDestination;
+    @Autowired
     private BusService busService;
 
     /**
@@ -228,10 +232,10 @@ public abstract class Protocol
 
                 Protocol.ActuatorPerforms task;
                 lastDestination = message.getJMSReplyTo();
-                task =
-                        new Protocol.ActuatorPerforms(command,
-                        message.getJMSReplyTo(),
-                        message.getJMSCorrelationID());
+                task
+                        = new Protocol.ActuatorPerforms(command,
+                                message.getJMSReplyTo(),
+                                message.getJMSCorrelationID());
                 task.start();
             } else {
                 if (payload instanceof EventTemplate) {
@@ -241,7 +245,6 @@ public abstract class Protocol
             }
         } catch (JMSException ex) {
             LOG.log(Level.SEVERE, null, ex);
-
 
         }
     }
@@ -295,7 +298,6 @@ public abstract class Protocol
         // sends back the command
         final String defaultCorrelationID = "-1";
         busService.reply(command, lastDestination, defaultCorrelationID);
-
 
     }
 

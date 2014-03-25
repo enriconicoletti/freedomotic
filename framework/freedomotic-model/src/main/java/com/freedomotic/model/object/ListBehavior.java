@@ -20,18 +20,26 @@
 package com.freedomotic.model.object;
 
 import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
 
 /**
  *
  * @author Enrico
  */
-public class ListBehavior
-        extends Behavior {
+@Entity
+@DiscriminatorValue(value = "ListBehavior")
+public class ListBehavior extends Behavior {
 
     private static final long serialVersionUID = 8375501744412227268L;
 
+    @Column
     private int selected;
-    private ArrayList<String> list = new ArrayList<String>();
+    @ElementCollection
+    private List<String> list = new ArrayList<String>();
 
     /**
      *
@@ -70,7 +78,7 @@ public class ListBehavior
      *
      * @return
      */
-    public ArrayList<String> getList() {
+    public List<String> getList() {
         return list;
     }
 

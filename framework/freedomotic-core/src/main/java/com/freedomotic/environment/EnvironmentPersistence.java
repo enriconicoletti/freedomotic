@@ -51,6 +51,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 /**
  *
@@ -59,7 +61,10 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 public final class EnvironmentPersistence {
 
     private static List<EnvironmentLogic> environments = new ArrayList<EnvironmentLogic>();
+    @Autowired
     private ClientStorage clientStorage;
+        @Autowired
+    private AutowireCapableBeanFactory autowireBeanFactory;
 
     /**
      *
@@ -68,7 +73,7 @@ public final class EnvironmentPersistence {
     @Inject
     public EnvironmentPersistence(ClientStorage clientStorage) {
         //disable instance creation
-        this.clientStorage = clientStorage;
+        //this.clientStorage = clientStorage;
     }
 
     /**
@@ -218,7 +223,7 @@ public final class EnvironmentPersistence {
         EnvironmentLogic envLogic = obj;
 
         if (MAKE_UNIQUE) {
-            envLogic = Freedomotic.INJECTOR.getInstance(EnvironmentLogic.class);
+            //envLogic = Freedomotic.INJECTOR.getInstance(EnvironmentLogic.class);
 
             //defensive copy to not affect the passed object with the changes
             Environment pojoCopy = SerialClone.clone(obj.getPojo());

@@ -29,7 +29,6 @@ import com.freedomotic.bus.BusService;
 import com.freedomotic.bus.StompDispatcher;
 import com.freedomotic.core.BehaviorManager;
 import com.freedomotic.environment.EnvironmentDAO;
-import com.freedomotic.environment.EnvironmentDAOFactory;
 import com.freedomotic.environment.EnvironmentLogic;
 import com.freedomotic.environment.EnvironmentPersistence;
 import com.freedomotic.events.PluginHasChanged;
@@ -46,7 +45,6 @@ import com.freedomotic.objects.EnvObjectLogic;
 import com.freedomotic.objects.EnvObjectPersistence;
 import com.freedomotic.plugins.ClientStorage;
 import com.freedomotic.plugins.filesystem.PluginsManager;
-import com.freedomotic.plugins.filesystem.PluginsManagerImpl;
 import com.freedomotic.reactions.Command;
 import com.freedomotic.reactions.CommandPersistence;
 import com.freedomotic.reactions.ReactionPersistence;
@@ -58,7 +56,6 @@ import com.freedomotic.serial.SerialConnectionProvider;
 import com.freedomotic.util.Info;
 import com.freedomotic.util.LogFormatter;
 import com.google.inject.Guice;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -128,10 +125,10 @@ public class Freedomotic implements BusConsumer {
     private BusMessagesListener listener;
     @Autowired
     private BusService busService;
-    @Autowired
-    private EnvironmentRepository envRepo;
-    @Autowired
-    private EnvObjectRepository objRepo;
+    //@Autowired
+    //private EnvironmentRepository envRepo;
+    //@Autowired
+    //private EnvObjectRepository objRepo;
 
     /**
      *
@@ -407,15 +404,15 @@ public class Freedomotic implements BusConsumer {
 
         LOG.info("Freedomotic startup completed");
 
-        for (EnvironmentLogic logic : EnvironmentPersistence.getEnvironments()) {
-            LOG.info("saving " + logic.getPojo().getName());
-            envRepo.save(logic.getPojo());
-        }
-
-        for (EnvObjectLogic logic : EnvObjectPersistence.getObjectList()) {
-            LOG.info("saving " + logic.getPojo().getName());
-            objRepo.save(logic.getPojo());
-        }
+//        for (EnvironmentLogic logic : EnvironmentPersistence.getEnvironments()) {
+//            LOG.info("saving " + logic.getPojo().getName());
+//            envRepo.save(logic.getPojo());
+//        }
+//
+//        for (EnvObjectLogic logic : EnvObjectPersistence.getObjectList()) {
+//            LOG.info("saving " + logic.getPojo().getName());
+//            objRepo.save(logic.getPojo());
+//        }
     }
 
     /**

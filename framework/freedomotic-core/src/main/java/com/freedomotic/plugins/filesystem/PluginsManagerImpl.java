@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 /**
  * An helper class that uses an internal DAO pattern to loadBoundle plugins of
@@ -41,8 +42,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class PluginsManagerImpl implements PluginsManager {
     //depedencies
 
-    @Autowired private ClientStorage clientStorage;
-    @Autowired private TriggerPersistence triggers;
+    @Autowired
+    private ClientStorage clientStorage;
+    @Autowired
+    private TriggerPersistence triggers;
+    @Autowired
+    private AutowireCapableBeanFactory autowireBeanFactory;
 
     @Inject
     public PluginsManagerImpl() {
@@ -111,6 +116,7 @@ public class PluginsManagerImpl implements PluginsManager {
             }
             if (client instanceof Plugin) {
                 Plugin p = (Plugin) client;
+                autowireBeanFactory.autowireBean(p);
                 p.loadPermissionsFromManifest();
                 if (p.getConfiguration().getBooleanProperty("enable-i18n", false)) {
                     p.getApi().getI18n().registerPluginBundleDir(p);
@@ -210,13 +216,13 @@ public class PluginsManagerImpl implements PluginsManager {
 
         if (templatesFolder.exists()) {
             //for every envobject class a placeholder is created
-            File[] templates =
-                    templatesFolder.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return (name.endsWith(".xobj"));
-                }
-            });
+            File[] templates
+                    = templatesFolder.listFiles(new FilenameFilter() {
+                        @Override
+                        public boolean accept(File dir, String name) {
+                            return (name.endsWith(".xobj"));
+                        }
+                    });
 
             for (File template : templates) {
                 Client placeholder;
@@ -304,9 +310,9 @@ public class PluginsManagerImpl implements PluginsManager {
                 packageFile.getProperty("package.nodeid"));
         client.getConfiguration()
                 .setProperty("framework.required.version",
-                packageFile.getProperty("framework.required.major") + "."
-                + packageFile.getProperty("framework.required.minor") + "."
-                + packageFile.getProperty("framework.required.build"));
+                        packageFile.getProperty("framework.required.major") + "."
+                        + packageFile.getProperty("framework.required.minor") + "."
+                        + packageFile.getProperty("framework.required.build"));
         client.getConfiguration().setProperty("framework.required.major",
                 packageFile.getProperty("framework.required.major"));
         client.getConfiguration().setProperty("framework.required.minor",

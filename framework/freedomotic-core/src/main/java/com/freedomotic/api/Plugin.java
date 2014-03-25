@@ -27,11 +27,11 @@ import com.freedomotic.events.PluginHasChanged.PluginActions;
 import com.freedomotic.model.ds.Config;
 import com.freedomotic.util.EqualsUtil;
 import com.freedomotic.util.Info;
-import com.google.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -44,64 +44,27 @@ public class Plugin
     /**
      *
      */
-    
     protected volatile boolean isRunning;
     private String pluginName;
     private String type = "Plugin";
-
-    /**
-     *
-     */
-    public Config configuration;
-
-    /**
-     *
-     */
     protected JFrame gui;
-    // private static final String SEPARATOR = "-";
-    //config file parameters
-
-    /**
-     *
-     */
-        protected String description;
-
-    /**
-     *
-     */
+    protected String description;
     protected String version;
-
-    /**
-     *
-     */
     protected String requiredVersion;
-
-    /**
-     *
-     */
     protected String category;
-
-    /**
-     *
-     */
     protected String shortName;
-
-    /**
-     *
-     */
     protected String listenOn;
-
-    /**
-     *
-     */
     protected String sendOn;
     private File path;
     final static int SAME_VERSION = 0;
     final static int FIRST_IS_OLDER = -1;
     final static int LAST_IS_OLDER = 1;
-    @Inject
+    @Autowired
     private API api;
+    @Autowired
     private BusService busService;
+ 
+    public Config configuration;
 
     /**
      *
@@ -322,13 +285,12 @@ public class Plugin
 //    public void setConnected() {
 //        isConnected = true;
 //    }
-
     /**
      *
      * @param aThat
      * @return
      */
-        @Override
+    @Override
     public boolean equals(Object aThat) {
         //check for self-comparison
         if (this == aThat) {
@@ -346,7 +308,6 @@ public class Plugin
 
         //Alternative to the above line :
         //if ( aThat == null || aThat.getClass() != this.getClass() ) return false;
-
         //cast to native object is now safe
         Plugin that = (Plugin) aThat;
 
@@ -430,6 +391,8 @@ public class Plugin
      *
      */
     public void loadPermissionsFromManifest() {
+        LOG.info(getApi().toString());
+        LOG.info(getApi().getAuth().toString());
         getApi().getAuth().setPluginPrivileges(this, configuration.getStringProperty("permissions", getApi().getAuth().getPluginDefaultPermission()));
     }
     private static final Logger LOG = Logger.getLogger(Plugin.class.getName());

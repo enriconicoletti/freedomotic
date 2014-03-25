@@ -24,6 +24,7 @@ package com.freedomotic.objects;
 import com.freedomotic.model.ds.Config;
 import com.freedomotic.model.object.ListBehavior;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -144,7 +145,7 @@ public class ListBehaviorLogic
      *
      * @return
      */
-    public ArrayList<String> getValuesList() {
+    public List<String> getValuesList() {
         return data.getList();
     }
 

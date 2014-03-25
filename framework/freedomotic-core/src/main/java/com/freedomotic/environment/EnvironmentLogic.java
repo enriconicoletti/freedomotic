@@ -38,6 +38,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -49,6 +50,7 @@ public final class EnvironmentLogic {
     private Environment pojo = null;
     private List<ZoneLogic> zones = new ArrayList<ZoneLogic>();
     private File source = null;
+    @Autowired
     private final API api;
     
     /**
@@ -66,10 +68,10 @@ public final class EnvironmentLogic {
      */
     @RequiresPermissions("environments:read")
     public Environment getPojo() {
-        if (api.getAuth().isPermitted("environments:read:" + pojo.getUuid().substring(0, 5))) {
+        //if (api.getAuth().isPermitted("environments:read:" + pojo.getUuid().substring(0, 5))) {
             return pojo;
-        }
-        return null;
+        //}
+        //return null;
     }
 
     /**

@@ -76,9 +76,9 @@ public class EnvObject implements Serializable {
     @Column
     private String phisicalAddress;
     @OneToMany(cascade = {CascadeType.ALL})
-    @JoinColumn(name = "behavior_id")
+    //@JoinColumn(name = "behavior_id")
     private List<Behavior> behaviors;
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.ALL})
     @JoinColumn(name = "representation_id")
     private List<Representation> representation;
     @ElementCollection

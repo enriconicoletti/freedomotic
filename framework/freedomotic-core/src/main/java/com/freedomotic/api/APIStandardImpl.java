@@ -36,7 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class APIStandardImpl
         implements API {
 
-    private EnvObjectPersistence object = new EnvObjectPersistence();
+    @Autowired
+    private EnvObjectPersistence object;
     @Autowired
     private ClientStorage clientStorage;
     @Autowired
@@ -47,40 +48,41 @@ public class APIStandardImpl
     private I18n i18n;
     @Autowired
     private PluginsManager plugManager;
-    private EnvironmentPersistence environment = new EnvironmentPersistence(clientStorage);
+    @Autowired
+    private EnvironmentPersistence environment;
 
     public APIStandardImpl() {
 
     }
 
-    /**
-     *
-     * @param environment
-     * @param object
-     * @param clientStorage
-     * @param config
-     * @param auth
-     * @param i18n
-     * @param plugManager
-     */
-    @Inject
-    public APIStandardImpl(
-            EnvironmentPersistence environment,
-            EnvObjectPersistence object,
-            ClientStorage clientStorage,
-            AppConfig config,
-            Auth auth,
-            I18n i18n,
-            PluginsManager plugManager) {
-        this.environment = environment;
-        this.object = object;
-        this.clientStorage = clientStorage;
-        this.config = config;
-        this.auth = auth;
-        this.i18n = i18n;
-        this.plugManager = plugManager;
-        System.out.println("auth in apiimpl is " + this.auth);
-    }
+//    /**
+//     *
+//     * @param environment
+//     * @param object
+//     * @param clientStorage
+//     * @param config
+//     * @param auth
+//     * @param i18n
+//     * @param plugManager
+//     */
+//    @Inject
+//    public APIStandardImpl(
+//            EnvironmentPersistence environment,
+//            EnvObjectPersistence object,
+//            ClientStorage clientStorage,
+//            AppConfig config,
+//            Auth auth,
+//            I18n i18n,
+//            PluginsManager plugManager) {
+//        this.environment = environment;
+//        this.object = object;
+//        this.clientStorage = clientStorage;
+//        this.config = config;
+//        this.auth = auth;
+//        this.i18n = i18n;
+//        this.plugManager = plugManager;
+//        System.out.println("auth in apiimpl is " + this.auth);
+//    }
 
     /**
      *

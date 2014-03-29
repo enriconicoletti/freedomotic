@@ -1,22 +1,20 @@
 /**
  *
- * Copyright (c) 2009-2013 Freedomotic team
- * http://freedomotic.com
+ * Copyright (c) 2009-2013 Freedomotic team http://freedomotic.com
  *
  * This file is part of Freedomotic
  *
- * This Program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * This Program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2, or (at your option) any later version.
  *
- * This Program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This Program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Freedomotic; see the file COPYING.  If not, see
+ * You should have received a copy of the GNU General Public License along with
+ * Freedomotic; see the file COPYING. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package com.freedomotic.bus.impl;
@@ -42,353 +40,362 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import org.apache.activemq.command.ActiveMQQueue;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Bus services implementation.
  * <p>
  * It is life cycle managed, see {@link LifeCycle}
- * 
+ *
  * @author Freedomotic Team
  *
  */
 @Singleton
 public class BusServiceImpl extends LifeCycle implements BusService {
 
-	private static final Logger LOG = Logger.getLogger(BusServiceImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(BusServiceImpl.class.getName());
 
+    @Autowired
     private AppConfig config;
 
     private BusBroker brokerHolder;
-	private BusConnection connectionHolder;
-	private DestinationRegistry destination;
-
-	private Session receiveSession;
-	private Session sendSession;
-	private Session unlistenedSession;
+    private BusConnection connectionHolder;
+    private DestinationRegistry destination;
+    private Session receiveSession;
+    private Session sendSession;
+    private Session unlistenedSession;
 
     /**
      *
      */
     protected MessageProducer messageProducer;
 
-	/**
-	 * {@inheritDoc}
+    /**
+     * {@inheritDoc}
+     *
      * @throws java.lang.Exception
-	 */
-	protected void start() throws Exception {
+     */
+    protected void start() throws Exception {
 
-		BootStatus.setCurrentStatus(BootStatus.BOOTING);
+        BootStatus.setCurrentStatus(BootStatus.BOOTING);
 
-		config = Freedomotic.INJECTOR.getInstance(AppConfig.class);
-		
-		brokerHolder = new BusBroker();
-		brokerHolder.init();
-		
-		connectionHolder = new BusConnection();
-		connectionHolder.init();
-		
-		destination = new DestinationRegistry();
+        //config = Freedomotic.INJECTOR.getInstance(AppConfig.class);
 
-		receiveSession = createSession();
-		// an unlistened session
-		unlistenedSession = createSession();
+        brokerHolder = new BusBroker();
+        brokerHolder.init();
 
-		sendSession = createSession();
-		// null parameter creates a producer with no specified destination
-		messageProducer = createMessageProducer();
+        connectionHolder = new BusConnection();
+        connectionHolder.init();
 
-		BootStatus.setCurrentStatus(BootStatus.STARTED);
-	}
+        destination = new DestinationRegistry();
 
-	private MessageProducer createMessageProducer() throws JMSException {
+        receiveSession = createSession();
+        // an unlistened session
+        unlistenedSession = createSession();
 
-		// null parameter creates a producer with no specified destination
-		final MessageProducer createProducer = sendSession.createProducer(null);
+        sendSession = createSession();
+        // null parameter creates a producer with no specified destination
+        messageProducer = createMessageProducer();
 
-		// configure
-		createProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-		final int tiemToLive = config.getIntProperty("KEY_MESSAGES_TTL", 1000);
-		createProducer.setTimeToLive(tiemToLive);
+        BootStatus.setCurrentStatus(BootStatus.STARTED);
+    }
 
-		return createProducer;
-	}
+    private MessageProducer createMessageProducer() throws JMSException {
 
-	/**
-	 * {@inheritDoc}
+        // null parameter creates a producer with no specified destination
+        final MessageProducer createProducer = sendSession.createProducer(null);
+
+        // configure
+        createProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+        final int tiemToLive = config.getIntProperty("KEY_MESSAGES_TTL", 1000);
+        createProducer.setTimeToLive(tiemToLive);
+
+        return createProducer;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * @throws java.lang.Exception
-	 */
-	protected void stop() throws Exception {
+     */
+    protected void stop() throws Exception {
 
-		BootStatus.setCurrentStatus(BootStatus.STOPPING);
+        BootStatus.setCurrentStatus(BootStatus.STOPPING);
 
-		messageProducer.close();
-		closeSession(sendSession);
+        messageProducer.close();
+        closeSession(sendSession);
 
-		closeSession(unlistenedSession);
-		closeSession(receiveSession);
+        closeSession(unlistenedSession);
+        closeSession(receiveSession);
 
-		connectionHolder.destroy();
-		brokerHolder.destroy();
+        connectionHolder.destroy();
+        brokerHolder.destroy();
 
-		BootStatus.setCurrentStatus(BootStatus.STOPPED);
-	}
+        BootStatus.setCurrentStatus(BootStatus.STOPPED);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	// TODO Freedomotic.java needs this method publicly visible. A whole repackage is needed.  
-	@Override
-	public void destroy() {
+    /**
+     * {@inheritDoc}
+     */
+    // TODO Freedomotic.java needs this method publicly visible. A whole repackage is needed.  
+    @Override
+    public void destroy() {
 
-		super.destroy();
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	// TODO Freedomotic.java needs this method publicly visible. A whole repackage is needed.  
-	@Override
-	public void init() {
-		
-		super.init();
-	}
+        super.destroy();
+    }
 
-	private void closeSession(final Session session) throws Exception {
+    /**
+     * {@inheritDoc}
+     */
+    // TODO Freedomotic.java needs this method publicly visible. A whole repackage is needed.  
+    @Override
+    public void init() {
 
-		session.close();
-	}
+        super.init();
+    }
 
-	private Session createSession() throws Exception {
+    private void closeSession(final Session session) throws Exception {
 
-		return connectionHolder.createSession();
-	}
+        session.close();
+    }
 
-	private MessageProducer getMessageProducer() {
+    private Session createSession() throws Exception {
 
-		return messageProducer;
-	}
+        return connectionHolder.createSession();
+    }
 
-	/**
-	 * {@inheritDoc}
-     * @return 
-	 */
-	public BusDestination registerCommandQueue(String queueName)
-			throws JMSException {
+    private MessageProducer getMessageProducer() {
 
-		return destination.registerCommandQueue(queueName);
+        return messageProducer;
+    }
 
-	}
+    /**
+     * {@inheritDoc}
+     *
+     * @return
+     */
+    public BusDestination registerCommandQueue(String queueName)
+            throws JMSException {
 
-	/**
-	 * {@inheritDoc}
-     * @return 
-	 */
-	public BusDestination registerEventQueue(String queueName)
-			throws JMSException {
+        return destination.registerCommandQueue(queueName);
 
-		return destination.registerEventQueue(queueName);
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-     * @return 
-	 */
-	public BusDestination registerTopic(String queueName) throws JMSException {
+    /**
+     * {@inheritDoc}
+     *
+     * @return
+     */
+    public BusDestination registerEventQueue(String queueName)
+            throws JMSException {
 
-		return destination.registerTopic(queueName);
-	}
+        return destination.registerEventQueue(queueName);
+    }
 
-	/**
-	 * {@inheritDoc}
-     * @return 
-	 */
-	public Session getReceiveSession() {
-		return receiveSession;
-	}
+    /**
+     * {@inheritDoc}
+     *
+     * @return
+     */
+    public BusDestination registerTopic(String queueName) throws JMSException {
 
-	/**
-	 * {@inheritDoc}
-     * @return 
-	 */
-	public Session getSendSession() {
-		return sendSession;
-	}
+        return destination.registerTopic(queueName);
+    }
 
-	/**
-	 * {@inheritDoc}
-     * @return 
-	 */
-	public Session getUnlistenedSession() {
-		return unlistenedSession;
-	}
+    /**
+     * {@inheritDoc}
+     *
+     * @return
+     */
+    public Session getReceiveSession() {
+        return receiveSession;
+    }
 
-	private ObjectMessage createObjectMessage() throws JMSException {
+    /**
+     * {@inheritDoc}
+     *
+     * @return
+     */
+    public Session getSendSession() {
+        return sendSession;
+    }
 
-		final Session sendSession = this.getSendSession();
-		ObjectMessage msg = sendSession.createObjectMessage();
+    /**
+     * {@inheritDoc}
+     *
+     * @return
+     */
+    public Session getUnlistenedSession() {
+        return unlistenedSession;
+    }
 
-		return msg;
-	}
+    private ObjectMessage createObjectMessage() throws JMSException {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void reply(Command command, Destination destination,
-			String correlationID) {
+        final Session sendSession = this.getSendSession();
+        ObjectMessage msg = sendSession.createObjectMessage();
 
-		try {
+        return msg;
+    }
 
-			ObjectMessage msg = createObjectMessage();
+    /**
+     * {@inheritDoc}
+     */
+    public void reply(Command command, Destination destination,
+            String correlationID) {
 
-			msg.setObject(command);
-			msg.setJMSCorrelationID(correlationID);
+        try {
 
-			final MessageProducer messageProducer = this.getMessageProducer();
-			messageProducer.send(destination, msg);
+            ObjectMessage msg = createObjectMessage();
 
-			Profiler.incrementSentReplies();
+            msg.setObject(command);
+            msg.setJMSCorrelationID(correlationID);
 
-		} catch (JMSException jmse) {
+            final MessageProducer messageProducer = this.getMessageProducer();
+            messageProducer.send(destination, msg);
 
-			LOG.severe(Freedomotic.getStackTraceInfo(jmse));
-		}
-	}
+            Profiler.incrementSentReplies();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public Command send(final Command command) {
+        } catch (JMSException jmse) {
 
-		try {
+            LOG.severe(Freedomotic.getStackTraceInfo(jmse));
+        }
+    }
 
-			ObjectMessage msg = createObjectMessage();
+    /**
+     * {@inheritDoc}
+     */
+    public Command send(final Command command) {
 
-			msg.setObject(command);
+        try {
 
-			Queue destination = new ActiveMQQueue(command.getReceiver());
+            ObjectMessage msg = createObjectMessage();
 
-			if (command.getReplyTimeout() > 0) {
+            msg.setObject(command);
+
+            Queue destination = new ActiveMQQueue(command.getReceiver());
+
+            if (command.getReplyTimeout() > 0) {
 
 				// we have to wait an execution reply for an hardware device or
-				// an external client
-				final Session unlistenedSession = this.getUnlistenedSession();
-				TemporaryQueue temporaryQueue = unlistenedSession
-						.createTemporaryQueue();
-				// TODO where this TemporaryQueue is delete? Should it be?
+                // an external client
+                final Session unlistenedSession = this.getUnlistenedSession();
+                TemporaryQueue temporaryQueue = unlistenedSession
+                        .createTemporaryQueue();
+                // TODO where this TemporaryQueue is delete? Should it be?
 
-				msg.setJMSReplyTo(temporaryQueue);
+                msg.setJMSReplyTo(temporaryQueue);
 
-				// a temporary consumer on a temporary queue
-				MessageConsumer responseConsumer = unlistenedSession
-						.createConsumer(temporaryQueue);
+                // a temporary consumer on a temporary queue
+                MessageConsumer responseConsumer = unlistenedSession
+                        .createConsumer(temporaryQueue);
 
-				final MessageProducer messageProducer = this.getMessageProducer();
-				messageProducer.send(destination, msg);
+                final MessageProducer messageProducer = this.getMessageProducer();
+                messageProducer.send(destination, msg);
 
-				Profiler.incrementSentCommands();
+                Profiler.incrementSentCommands();
 
-				// the receive() call is blocking so we execute it in a thread
-				LOG.config("Send and await reply to command '"
-						+ command.getName() + "' for "
-						+ command.getReplyTimeout() + "ms");
+                // the receive() call is blocking so we execute it in a thread
+                LOG.config("Send and await reply to command '"
+                        + command.getName() + "' for "
+                        + command.getReplyTimeout() + "ms");
 
-				Message jmsResponse = responseConsumer.receive(command
-						.getReplyTimeout());
+                Message jmsResponse = responseConsumer.receive(command
+                        .getReplyTimeout());
 
-				if (jmsResponse != null) {
+                if (jmsResponse != null) {
 
-					// TODO unchecked cast!
-					ObjectMessage objMessage = (ObjectMessage) jmsResponse;
+                    // TODO unchecked cast!
+                    ObjectMessage objMessage = (ObjectMessage) jmsResponse;
 
 					// a command is sent, we expect a command as reply
-					// TODO unchecked cast!
-					Command reply = (Command) objMessage.getObject();
+                    // TODO unchecked cast!
+                    Command reply = (Command) objMessage.getObject();
 
-					LOG.config("Reply to command '"
-							+ command.getName() + "' received. Result is "
-							+ reply.getProperty("result"));
+                    LOG.config("Reply to command '"
+                            + command.getName() + "' received. Result is "
+                            + reply.getProperty("result"));
 
-					Profiler.incrementReceivedReplies();
+                    Profiler.incrementReceivedReplies();
 
-					return reply;
+                    return reply;
 
-				} else {
+                } else {
 
-					LOG.config("Command '" + command.getName()
-							+ "' timed out after " + command.getReplyTimeout()
-							+ "ms");
+                    LOG.config("Command '" + command.getName()
+                            + "' timed out after " + command.getReplyTimeout()
+                            + "ms");
 
-					Profiler.incrementTimeoutedReplies();
-				}
+                    Profiler.incrementTimeoutedReplies();
+                }
 
-				// mark as failed
-				command.setExecuted(false);
+                // mark as failed
+                command.setExecuted(false);
 
-				// returns back the original inaltered command
-				return command;
+                // returns back the original inaltered command
+                return command;
 
-			} else {
+            } else {
 
 				// send the message immediately without creating temporary
-				// queues and consumers on it
-				// this increments perfornances if no reply is expected
-				final MessageProducer messageProducer = this.getMessageProducer();
-				messageProducer.send(destination, msg);
+                // queues and consumers on it
+                // this increments perfornances if no reply is expected
+                final MessageProducer messageProducer = this.getMessageProducer();
+                messageProducer.send(destination, msg);
 
-				Profiler.incrementSentCommands();
+                Profiler.incrementSentCommands();
 
-				command.setExecuted(true);
+                command.setExecuted(true);
 
 				// always say it is executed (it's not sure but the caller is
-				// not interested: best effort)
-				return command;
-			}
-		} catch (JMSException ex) {
+                // not interested: best effort)
+                return command;
+            }
+        } catch (JMSException ex) {
 
-			LOG.severe(Freedomotic.getStackTraceInfo(ex));
+            LOG.severe(Freedomotic.getStackTraceInfo(ex));
 
-			command.setExecuted(false);
+            command.setExecuted(false);
 
-			return command;
-		}
-	}
+            return command;
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void send(EventTemplate ev) {
+    /**
+     * {@inheritDoc}
+     */
+    public void send(EventTemplate ev) {
 
-		send(ev, ev.getDefaultDestination());
-	}
+        send(ev, ev.getDefaultDestination());
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void send(final EventTemplate ev, final String to) {
+    /**
+     * {@inheritDoc}
+     */
+    public void send(final EventTemplate ev, final String to) {
 
-		// TODO should this null check be here?
-		if (ev != null) {
+        // TODO should this null check be here?
+        if (ev != null) {
 
-			try {
+            try {
 
-				ObjectMessage msg = createObjectMessage();
+                ObjectMessage msg = createObjectMessage();
 
-				msg.setObject(ev);
+                msg.setObject(ev);
 
 				// a consumer consumes on
-				// Consumer.A_PROGRESSIVE_INTEGER_ID.VirtualTopic.
-				BusDestination busDestination = this.registerTopic(to);
-				Destination tmpTopic = busDestination.getDestination();
+                // Consumer.A_PROGRESSIVE_INTEGER_ID.VirtualTopic.
+                BusDestination busDestination = this.registerTopic(to);
+                Destination tmpTopic = busDestination.getDestination();
 
-				final MessageProducer messageProducer = this.getMessageProducer();
-				messageProducer.send(tmpTopic, msg);
+                final MessageProducer messageProducer = this.getMessageProducer();
+                messageProducer.send(tmpTopic, msg);
 
-				Profiler.incrementSentEvents();
+                Profiler.incrementSentEvents();
 
-			} catch (JMSException ex) {
+            } catch (JMSException ex) {
 
-				LOG.severe(Freedomotic.getStackTraceInfo(ex));
-			}
-		}
-	}
+                LOG.severe(Freedomotic.getStackTraceInfo(ex));
+            }
+        }
+    }
 }

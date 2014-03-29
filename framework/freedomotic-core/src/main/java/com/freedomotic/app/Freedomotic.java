@@ -168,8 +168,8 @@ public class Freedomotic implements BusConsumer {
                 + "\n" + "Resources Path: " + resourcesPath);
 
         // Initialize bus here!
-        busService = INJECTOR.getInstance(BusService.class);
-        busService.init();
+        //busService = INJECTOR.getInstance(BusService.class);
+        //busService.init();
 
         // register listener
         this.listener = new BusMessagesListener(this);

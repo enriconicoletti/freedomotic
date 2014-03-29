@@ -1,22 +1,20 @@
 /**
  *
- * Copyright (c) 2009-2013 Freedomotic team
- * http://freedomotic.com
+ * Copyright (c) 2009-2013 Freedomotic team http://freedomotic.com
  *
  * This file is part of Freedomotic
  *
- * This Program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * This Program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2, or (at your option) any later version.
  *
- * This Program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This Program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Freedomotic; see the file COPYING.  If not, see
+ * You should have received a copy of the GNU General Public License along with
+ * Freedomotic; see the file COPYING. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package com.freedomotic.bus;
@@ -31,167 +29,169 @@ import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * {@link MessageListener} implementation (former AbstractBusConnector class)
  * <p>
- * Receives an {@link ObjectMessage} (it can be an event or a command) and sends it to his {@link BusConsumer}
+ * Receives an {@link ObjectMessage} (it can be an event or a command) and sends
+ * it to his {@link BusConsumer}
  * <p>
- * This is the bus hook for any {@link BusConsumer} that should register itself in this listener.
- * 
+ * This is the bus hook for any {@link BusConsumer} that should register itself
+ * in this listener.
+ *
  * @author Freedomotic Team
- * 
+ *
  * @see BusConsumer
  */
 public class BusMessagesListener implements MessageListener {
 
-	private static final Logger LOG = Logger
-			.getLogger(BusMessagesListener.class.getName());
+    private static final Logger LOG = Logger
+            .getLogger(BusMessagesListener.class.getName());
 
-	private BusService busService;
+    @Autowired
+    private BusService busService;
+    @Autowired
+    private BusConsumer busConsumer;
+    @Autowired
+    private MessageConsumer messageConsumer;
 
-	private BusConsumer busConsumer;
+    /**
+     * Constructor
+     *
+     * @param busConsumer
+     */
+    public BusMessagesListener(BusConsumer busConsumer) {
 
-	private MessageConsumer messageConsumer;
+        this.busConsumer = busConsumer;
+        this.busService = Freedomotic.INJECTOR.getInstance(BusService.class);
+    }
 
-	/**
-	 * Constructor
-	 * 
-	 * @param busConsumer
-	 */
-	public BusMessagesListener(BusConsumer busConsumer) {
+    /**
+     * Passes a message to the listener
+     *
+     * @param message
+     */
+    @Override
+    public final void onMessage(Message message) {
 
-		this.busConsumer = busConsumer;
-		this.busService = Freedomotic.INJECTOR.getInstance(BusService.class);
-	}
+        Profiler.incrementReceivedEvents();
 
-	/**
-	 * Passes a message to the listener
-	 * 
-	 * @param message
-	 */
-	@Override
-	public final void onMessage(Message message) {
+        if (message instanceof ObjectMessage) {
 
-		Profiler.incrementReceivedEvents();
+            final ObjectMessage objectMessage = (ObjectMessage) message;
 
-		if (message instanceof ObjectMessage) {
+            busConsumer.onMessage(objectMessage);
 
-			final ObjectMessage objectMessage = (ObjectMessage) message;
+        } else {
 
-			busConsumer.onMessage(objectMessage);
+            LOG.severe("Message received by " + this.getClass().getSimpleName()
+                    + " is not an object message, is a "
+                    + message.getClass().getCanonicalName());
 
-		} else {
+            if (message instanceof TextMessage) {
 
-			LOG.severe("Message received by " + this.getClass().getSimpleName()
-					+ " is not an object message, is a "
-					+ message.getClass().getCanonicalName());
+                TextMessage text = (TextMessage) message;
 
-			if (message instanceof TextMessage) {
+                try {
 
-				TextMessage text = (TextMessage) message;
+                    LOG.severe(text.getText());
 
-				try {
+                } catch (JMSException ex) {
 
-					LOG.severe(text.getText());
+                    // Do nothing.
+                }
+            }
+        }
+    }
 
-				} catch (JMSException ex) {
+    /**
+     * Registers on a command queue
+     *
+     * @param queueName Queue name
+     */
+    public void consumeCommandFrom(String queueName) {
 
-					// Do nothing.
-				}
-			}
-		}
-	}
+        try {
 
-	/**
-	 * Registers on a command queue
-	 * 
-	 * @param queueName Queue name
-	 */
-	public void consumeCommandFrom(String queueName) {
+            BusDestination busDestination = busService
+                    .registerCommandQueue(queueName);
 
-		try {
+            registerOnQueue(busDestination);
 
-			BusDestination busDestination = busService
-					.registerCommandQueue(queueName);
+        } catch (JMSException e) {
 
-			registerOnQueue(busDestination);
+            LOG.severe(Freedomotic.getStackTraceInfo(e));
+        }
+    }
 
-		} catch (JMSException e) {
+    /**
+     * Registers on a event queue
+     *
+     * @param queueName Queue name
+     */
+    public void consumeEventFrom(String queueName) {
 
-			LOG.severe(Freedomotic.getStackTraceInfo(e));
-		}
-	}
+        try {
 
-	/**
-	 * Registers on a event queue
-	 * 
-	 * @param queueName Queue name
-	 */
-	public void consumeEventFrom(String queueName) {
+            BusDestination busDestination = busService
+                    .registerEventQueue(queueName);
 
-		try {
+            registerOnQueue(busDestination);
 
-			BusDestination busDestination = busService
-					.registerEventQueue(queueName);
+        } catch (JMSException e) {
 
-			registerOnQueue(busDestination);
+            LOG.severe(Freedomotic.getStackTraceInfo(e));
+        }
+    }
 
-		} catch (JMSException e) {
+    private void registerOnQueue(BusDestination destination)
+            throws JMSException {
 
-			LOG.severe(Freedomotic.getStackTraceInfo(e));
-		}
-	}
+        final Session receiveSession = busService.getReceiveSession();
+        messageConsumer = receiveSession.createConsumer(destination
+                .getDestination());
+        messageConsumer.setMessageListener(this);
 
-	private void registerOnQueue(BusDestination destination)
-			throws JMSException {
+        LOG.info(busConsumer.getClass().getSimpleName() + " listen on "
+                + destination.getDestinationName());
 
-		final Session receiveSession = busService.getReceiveSession();
-		messageConsumer = receiveSession.createConsumer(destination
-				.getDestination());
-		messageConsumer.setMessageListener(this);
+    }
 
-		LOG.info(busConsumer.getClass().getSimpleName() + " listen on "
-				+ destination.getDestinationName());
+    /**
+     * Unsubscribes from topics queues
+     * <br>
+     * (invocations should be life cycle managed)
+     */
+    public void unsubscribe() {
 
-	}
+        try {
 
-	/**
-	 * Unsubscribes from topics queues
-	 * <br>
-	 * (invocations should be life cycle managed)
-	 */
-	public void unsubscribe() {
-
-		try {
-
-			messageConsumer.close();
+            messageConsumer.close();
 
 			// FIXME LCG Some unsuscribe invocations are pending 
-			
 			// TODO Why is suppossed to be always suscribed within the
-			// receiveSession?
-
+            // receiveSession?
 			// BusService busService = BusService.getInstance();
-			// final Session receiveSession = busService.getReceiveSession();
-			// receiveSession.unsubscribe(
-			// ..retrieve channel from an internal list populated on
-			// registration..);
+            // final Session receiveSession = busService.getReceiveSession();
+            // receiveSession.unsubscribe(
+            // ..retrieve channel from an internal list populated on
+            // registration..);
+        } catch (JMSException e) {
 
-		} catch (JMSException e) {
-
-			LOG.severe(e.getMessage());
+            LOG.severe(e.getMessage());
 
 			// "Unable to unsubscribe from event channel "
-			// + getChannelName());
+            // + getChannelName());
+        } catch (Exception e) {
 
-		} catch (Exception e) {
+            LOG.warning(e.getMessage());
+        }
+    }
 
-			LOG.warning(e.getMessage());
-		}
-	}
-
-	/** FIXME LCG is really unused? */
+    /**
+     * FIXME LCG is really unused?
+     */
 //	private ObjectMessage createObjectMessage() throws JMSException {
 //
 //		final Session sendSession = busService.getSendSession();

@@ -79,7 +79,9 @@ public class SpringConfig implements TransactionManagementConfigurer {
 
     @Bean
     public AppConfig appConfig() {
-        return new AppConfigImpl().load();
+        AppConfigImpl appConfigImpl = new AppConfigImpl();
+        appConfigImpl.load();
+        return appConfigImpl;
     }
     
     @Bean
@@ -89,7 +91,9 @@ public class SpringConfig implements TransactionManagementConfigurer {
 
     @Bean
     public BusService busService() {
-        return new BusServiceImpl();
+        BusServiceImpl busServiceImpl = new BusServiceImpl();
+        busServiceImpl.init();
+        return busServiceImpl;
     }
 
     @Bean

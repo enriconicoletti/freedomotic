@@ -39,27 +39,31 @@ import java.util.logging.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author enrico
  */
+@Component
 public final class EnvironmentLogic {
 
     private Graph graph = null;
     private Environment pojo = null;
     private List<ZoneLogic> zones = new ArrayList<ZoneLogic>();
     private File source = null;
-    @Autowired
-    private final API api;
-    
+
+
+    public EnvironmentLogic() {
+    }
+
     /**
      *
      * @param api
      */
     @Inject
     public EnvironmentLogic(API api) {
-        this.api = api;
+
     }
 
     /**
@@ -69,7 +73,7 @@ public final class EnvironmentLogic {
     @RequiresPermissions("environments:read")
     public Environment getPojo() {
         //if (api.getAuth().isPermitted("environments:read:" + pojo.getUuid().substring(0, 5))) {
-            return pojo;
+        return pojo;
         //}
         //return null;
     }
@@ -185,8 +189,7 @@ public final class EnvironmentLogic {
 
     /**
      *
-     * @return
-     * @deprecated
+     * @return @deprecated
      */
     @Deprecated
     @RequiresPermissions("environments:read")
@@ -228,7 +231,7 @@ public final class EnvironmentLogic {
 
                 if (!zones.contains(room)) {
                     Freedomotic.logger.config("Adding room " + room);
-                    
+
                     this.zones.add(room);
                 } else {
                     Freedomotic.logger.warning("Attempt to add a null or an already existent room " + room);
@@ -309,5 +312,5 @@ public final class EnvironmentLogic {
         return this.getPojo().getName();
     }
     private static final Logger LOG = Logger.getLogger(EnvironmentLogic.class.getName());
-    
+
 }

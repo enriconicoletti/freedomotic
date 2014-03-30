@@ -38,6 +38,8 @@ import java.util.regex.Pattern;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Translates a generic request like 'turn on light 1' into a series of hardware
@@ -66,6 +68,7 @@ public final class BehaviorManager
     public static final String PROPERTY_OBJECT_PROTOCOL = "object.protocol";
     public static final String PROPERTY_OBJECT = "object";
     private static BusMessagesListener listener;
+    @Autowired
     private BusService busService;
 
     static String getMessagingChannel() {
@@ -76,7 +79,7 @@ public final class BehaviorManager
      *
      */
     public BehaviorManager() {
-        this.busService = Freedomotic.INJECTOR.getInstance(BusService.class);
+        //this.busService = Freedomotic.INJECTOR.getInstance(BusService.class);
         register();
     }
 
@@ -84,7 +87,7 @@ public final class BehaviorManager
      * Register one or more channels to listen to
      */
     private void register() {
-        listener = new BusMessagesListener(this);
+        listener = new BusMessagesListener(busService, this);
         listener.consumeCommandFrom(getMessagingChannel());
     }
 

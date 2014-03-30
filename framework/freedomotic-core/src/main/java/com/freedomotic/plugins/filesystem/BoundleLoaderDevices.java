@@ -6,22 +6,29 @@ package com.freedomotic.plugins.filesystem;
 
 import com.freedomotic.api.Client;
 import com.freedomotic.api.Plugin;
-import com.freedomotic.app.Freedomotic;
 import com.freedomotic.exceptions.PluginLoadingException;
 import com.freedomotic.util.JarFilter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author enrico
  */
-class BoundleLoaderDevices implements BoundleLoader {
+@Component
+public class BoundleLoaderDevices implements BoundleLoader {
 
     private static final Logger LOG = Logger.getLogger(BoundleLoaderDevices.class.getName());
     private File path;
+    
+    BoundleLoaderDevices(){
+        
+    }
 
     BoundleLoaderDevices(File path) {
         this.path = path;
@@ -61,7 +68,8 @@ class BoundleLoaderDevices implements BoundleLoader {
                                     || (superclass.getName().equals("com.freedomotic.api.Intelligence"))
                                     || (superclass.getName().equals("com.freedomotic.api.Tool"))) {
                                 try {
-                                    plugin = (Plugin) Freedomotic.INJECTOR.getInstance(clazz);
+                                    plugin = (Plugin) clazz.newInstance();//Freedomotic.INJECTOR.getInstance(clazz);
+                                    plugin.init();
                                     results.add(plugin);
                                 //} catch (InstantiationException ex) {
                                 //    throw new PluginLoadingException("Cannot instantiate plugin "

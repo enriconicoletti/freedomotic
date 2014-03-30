@@ -28,6 +28,7 @@ package com.freedomotic.core;
 import com.freedomotic.api.Plugin;
 import com.freedomotic.bus.BusConsumer;
 import com.freedomotic.bus.BusMessagesListener;
+import com.freedomotic.bus.BusService;
 import com.freedomotic.model.ds.Config;
 import com.freedomotic.plugins.ClientStorage;
 import com.google.inject.Inject;
@@ -35,6 +36,7 @@ import com.google.inject.Singleton;
 import java.util.logging.Logger;
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -50,6 +52,8 @@ public class JoinPlugin
     private static final String MESSAGING_CHANNEL ="app.objects.create";
 		
 	private static BusMessagesListener listener;
+            @Autowired
+    private BusService busService;
 	
 	//dependency
 
@@ -69,7 +73,7 @@ public class JoinPlugin
      * Register one or more channels to listen to
      */
 	private void register() {
-		listener = new BusMessagesListener(this);
+		listener = new BusMessagesListener(busService, this);
 		listener.consumeCommandFrom(getMessagingChannel());}
 
     @Override

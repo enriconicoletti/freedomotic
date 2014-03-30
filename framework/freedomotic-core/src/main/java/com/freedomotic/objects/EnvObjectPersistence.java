@@ -151,8 +151,8 @@ public class EnvObjectPersistence {
         File[] files = folder.listFiles();
 
         // This filter only returns object files
-        FileFilter objectFileFileter =
-                new FileFilter() {
+        FileFilter objectFileFileter
+                = new FileFilter() {
                     @Override
                     public boolean accept(File file) {
                         if (file.isFile() && file.getName().endsWith(".xobj")) {
@@ -189,8 +189,8 @@ public class EnvObjectPersistence {
         File[] files = folder.listFiles();
 
         // This filter only returns object files
-        FileFilter objectFileFilter =
-                new FileFilter() {
+        FileFilter objectFileFilter
+                = new FileFilter() {
                     @Override
                     public boolean accept(File file) {
                         if (file.isFile() && file.getName().endsWith(".xobj")) {
@@ -227,7 +227,7 @@ public class EnvObjectPersistence {
      * Loads the object file from file but NOT add the object to the list
      *
      * @param file
-     * @return 
+     * @return
      */
     public static EnvObjectLogic loadObject(File file)
             throws DaoLayerException {
@@ -243,7 +243,7 @@ public class EnvObjectPersistence {
             EnvObjectLogic objectLogic = null;
 
             try {
-                objectLogic = EnvObjectFactory.create(pojo);
+                objectLogic = new EnvObjectFactory().create(pojo);
                 LOG.config("Created a new logic for " + objectLogic.getPojo().getName()
                         + " of type " + objectLogic.getClass().getCanonicalName().toString());
 
@@ -456,7 +456,7 @@ public class EnvObjectPersistence {
             pojoCopy.setUUID(UUID.randomUUID().toString());
 
             try {
-                envObjectLogic = EnvObjectFactory.create(pojoCopy);
+                envObjectLogic = new EnvObjectFactory().create(pojoCopy);
             } catch (DaoLayerException ex) {
                 LOG.warning(ex.getMessage());
             }

@@ -7,11 +7,13 @@ package com.freedomotic.plugins.filesystem;
 import com.freedomotic.exceptions.PluginLoadingException;
 import java.io.File;
 import java.net.URL;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author enrico
  */
+@Component
 public interface PluginsManager {
 
     /**
@@ -31,7 +33,8 @@ public interface PluginsManager {
 
     /**
      * Install a plugins boundle downloading it from remote URL
-     * @return 
+     *
+     * @return
      */
     boolean installBoundle(URL fromURL);
 
@@ -53,13 +56,13 @@ public interface PluginsManager {
     void loadAllPlugins() throws PluginLoadingException;
 
     /**
-     * Load a single plugin package from a given directory. This directory should be the
-     * root path of the plugin package, not a directory containing more than one
-     * plugin package.
+     * Load a single plugin package from a given directory. This directory
+     * should be the root path of the plugin package, not a directory containing
+     * more than one plugin package.
      *
      * @param directory
      * @throws PluginLoadingException
      */
     void loadSingleBoundle(File directory) throws PluginLoadingException;
-    
+
 }

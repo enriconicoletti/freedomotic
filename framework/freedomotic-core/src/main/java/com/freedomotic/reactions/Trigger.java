@@ -1,31 +1,31 @@
 /**
  *
- * Copyright (c) 2009-2013 Freedomotic team
- * http://freedomotic.com
+ * Copyright (c) 2009-2013 Freedomotic team http://freedomotic.com
  *
  * This file is part of Freedomotic
  *
- * This Program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * This Program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2, or (at your option) any later version.
  *
- * This Program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This Program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Freedomotic; see the file COPYING.  If not, see
+ * You should have received a copy of the GNU General Public License along with
+ * Freedomotic; see the file COPYING. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package com.freedomotic.reactions;
 
 import com.freedomotic.api.EventTemplate;
+import com.freedomotic.app.ApplicationContextLocator;
 import com.freedomotic.app.Freedomotic;
 import com.freedomotic.app.Profiler;
 import com.freedomotic.bus.BusConsumer;
 import com.freedomotic.bus.BusMessagesListener;
+import com.freedomotic.bus.BusService;
 import com.freedomotic.core.TriggerCheck;
 import com.google.inject.Inject;
 import java.text.DateFormat;
@@ -36,11 +36,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author enrico
  */
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Component
 public final class Trigger implements BusConsumer, Cloneable {
 
     private String name;
@@ -62,8 +70,10 @@ public final class Trigger implements BusConsumer, Cloneable {
     private long suspensionStart;
     private BusMessagesListener listener;
     //dependencies
-    @Inject
+    @Autowired
     private TriggerCheck checker;
+    @Autowired
+    private BusService busService;
 
     /**
      *
@@ -75,14 +85,16 @@ public final class Trigger implements BusConsumer, Cloneable {
      *
      */
     public void register() {
-		
-		LOG.info("Registering the trigger named '" + getName() + "'");
-		listener = new BusMessagesListener(this);
-		listener.consumeEventFrom(channel);
-		numberOfExecutions = 0;
-		suspensionStart = System.currentTimeMillis();
-		Freedomotic.INJECTOR.injectMembers(this);
-	}
+        LOG.info("Registering the trigger named '" + getName() + "'");
+        ApplicationContext context = ApplicationContextLocator.getApplicationContext();
+        AutowireCapableBeanFactory factory = context.getAutowireCapableBeanFactory();
+        factory.autowireBean(this);
+        listener = new BusMessagesListener(busService, this);
+        listener.consumeEventFrom(channel);
+        numberOfExecutions = 0;
+        suspensionStart = System.currentTimeMillis();
+        //Freedomotic.INJECTOR.injectMembers(this);
+    }
 
     /**
      *
@@ -209,12 +221,11 @@ public final class Trigger implements BusConsumer, Cloneable {
     }
 
     //can be moved to a stategy pattern
-
     /**
      *
      * @return
      */
-        public boolean canFire() {
+    public boolean canFire() {
         //num of executions < max executions
         if (getMaxExecutions() > -1) { //not unlimited
 
@@ -427,10 +438,10 @@ public final class Trigger implements BusConsumer, Cloneable {
      *
      */
     public void unregister() {
-		if (listener != null) {
-			listener.unsubscribe();
-		}
-	}
+        if (listener != null) {
+            listener.unsubscribe();
+        }
+    }
 
     /**
      *

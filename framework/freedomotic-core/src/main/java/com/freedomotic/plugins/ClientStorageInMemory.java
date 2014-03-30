@@ -37,15 +37,17 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * A storage of loaded plugins and connected clients
  */
+@Component
 public final class ClientStorageInMemory implements ClientStorage {
 
     private final List<Client> clients = new ArrayList<Client>();
-    
+    @Autowired
+    private BusService busService;
 
 
     /**
@@ -64,7 +66,7 @@ public final class ClientStorageInMemory implements ClientStorage {
         if (!clients.contains(c)) {
             if (isCompatible(c)) {
                 //force injection as this class is not built by guice
-                Freedomotic.INJECTOR.injectMembers(c);
+                //Freedomotic.INJECTOR.injectMembers(c);
 
                 clients.add(c);
             } else {
@@ -80,7 +82,7 @@ public final class ClientStorageInMemory implements ClientStorage {
             PluginHasChanged event =
                     new PluginHasChanged(ClientStorageInMemory.class,
                     c.getName(), PluginActions.ENQUEUE);
-            final BusService busService = Freedomotic.INJECTOR.getInstance(BusService.class);
+            //final BusService busService = Freedomotic.INJECTOR.getInstance(BusService.class);
             busService.send(event);
             LOG.log(Level.CONFIG,
                     "{0} added to plugins list.",
@@ -100,7 +102,7 @@ public final class ClientStorageInMemory implements ClientStorage {
             PluginHasChanged event =
                     new PluginHasChanged(ClientStorageInMemory.class,
                     c.getName(), PluginActions.DEQUEUE);
-            final BusService busService = Freedomotic.INJECTOR.getInstance(BusService.class);
+            //final BusService busService = Freedomotic.INJECTOR.getInstance(BusService.class);
             busService.send(event);
         }
     }

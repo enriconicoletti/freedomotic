@@ -35,9 +35,6 @@ class BoundleLoaderFactory {
     //it's package protected to not make it visible from outside
     protected static final Injector injector = Guice.createInjector(new DependenciesInjector());
 
-    BoundleLoaderFactory() {
-    }
-
     /**
      * Takes in input the type of the plugins and from this creates a pointer to the right 
      * filesystem folder, used later to loadBoundle all plugins at this path.
@@ -90,8 +87,6 @@ class BoundleLoaderFactory {
      * @return
      */
     protected BoundleLoader getSingleBoundleLoader(File directory) {
-        System.out.println(directory);
-
         //intantiate the right loader based on the directory passed to the searchIn method
         String devicesPath = new File(Info.PATH_PLUGINS_FOLDER + "/devices/").toString();
 
@@ -111,7 +106,7 @@ class BoundleLoaderFactory {
             return new BoundleLoaderEvents(directory);
         }
 
-        return null;
+        throw new IllegalStateException("Cannot find a suitable plugin boundle loader to load plugins in " + directory.getAbsolutePath());
     }
 
     protected static List<String> getClassesInside(String jarName)

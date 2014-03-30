@@ -41,6 +41,7 @@ import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Bus services implementation.
@@ -50,13 +51,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Freedomotic Team
  *
  */
-@Singleton
+@Component
 public class BusServiceImpl extends LifeCycle implements BusService {
 
     private static final Logger LOG = Logger.getLogger(BusServiceImpl.class.getName());
 
-    @Autowired
-    private AppConfig config;
+    //@Autowired
+    //private AppConfig config;
 
     private BusBroker brokerHolder;
     private BusConnection connectionHolder;
@@ -64,10 +65,6 @@ public class BusServiceImpl extends LifeCycle implements BusService {
     private Session receiveSession;
     private Session sendSession;
     private Session unlistenedSession;
-
-    /**
-     *
-     */
     protected MessageProducer messageProducer;
 
     /**
@@ -87,7 +84,7 @@ public class BusServiceImpl extends LifeCycle implements BusService {
         connectionHolder = new BusConnection();
         connectionHolder.init();
 
-        destination = new DestinationRegistry();
+        destination = new DestinationRegistry(this);
 
         receiveSession = createSession();
         // an unlistened session
@@ -107,7 +104,7 @@ public class BusServiceImpl extends LifeCycle implements BusService {
 
         // configure
         createProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-        final int tiemToLive = config.getIntProperty("KEY_MESSAGES_TTL", 1000);
+        final int tiemToLive = 60000;//config.getIntProperty("KEY_MESSAGES_TTL", 1000);
         createProducer.setTimeToLive(tiemToLive);
 
         return createProducer;
@@ -264,6 +261,7 @@ public class BusServiceImpl extends LifeCycle implements BusService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Command send(final Command command) {
 
         try {
@@ -276,7 +274,7 @@ public class BusServiceImpl extends LifeCycle implements BusService {
 
             if (command.getReplyTimeout() > 0) {
 
-				// we have to wait an execution reply for an hardware device or
+                // we have to wait an execution reply for an hardware device or
                 // an external client
                 final Session unlistenedSession = this.getUnlistenedSession();
                 TemporaryQueue temporaryQueue = unlistenedSession
@@ -307,7 +305,7 @@ public class BusServiceImpl extends LifeCycle implements BusService {
                     // TODO unchecked cast!
                     ObjectMessage objMessage = (ObjectMessage) jmsResponse;
 
-					// a command is sent, we expect a command as reply
+                    // a command is sent, we expect a command as reply
                     // TODO unchecked cast!
                     Command reply = (Command) objMessage.getObject();
 
@@ -336,7 +334,7 @@ public class BusServiceImpl extends LifeCycle implements BusService {
 
             } else {
 
-				// send the message immediately without creating temporary
+                // send the message immediately without creating temporary
                 // queues and consumers on it
                 // this increments perfornances if no reply is expected
                 final MessageProducer messageProducer = this.getMessageProducer();
@@ -346,7 +344,7 @@ public class BusServiceImpl extends LifeCycle implements BusService {
 
                 command.setExecuted(true);
 
-				// always say it is executed (it's not sure but the caller is
+                // always say it is executed (it's not sure but the caller is
                 // not interested: best effort)
                 return command;
             }
@@ -382,7 +380,7 @@ public class BusServiceImpl extends LifeCycle implements BusService {
 
                 msg.setObject(ev);
 
-				// a consumer consumes on
+                // a consumer consumes on
                 // Consumer.A_PROGRESSIVE_INTEGER_ID.VirtualTopic.
                 BusDestination busDestination = this.registerTopic(to);
                 Destination tmpTopic = busDestination.getDestination();

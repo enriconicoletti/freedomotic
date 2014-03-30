@@ -63,8 +63,6 @@ public final class EnvironmentPersistence {
     private static List<EnvironmentLogic> environments = new ArrayList<EnvironmentLogic>();
     @Autowired
     private ClientStorage clientStorage;
-        @Autowired
-    private AutowireCapableBeanFactory autowireBeanFactory;
 
     /**
      *
@@ -434,7 +432,7 @@ public final class EnvironmentPersistence {
             throw new DaoLayerException("XML parsing error. Readed XML is \n" + xml, e);
         }
 
-        EnvironmentLogic envLogic = Freedomotic.INJECTOR.getInstance(EnvironmentLogic.class);
+        EnvironmentLogic envLogic = new EnvironmentLogic();//Freedomotic.INJECTOR.getInstance(EnvironmentLogic.class);
 
         if (pojo == null) {
             throw new IllegalStateException("Object data cannot be null at this stage");

@@ -7,6 +7,8 @@ package com.freedomotic.app;
 
 import com.freedomotic.api.API;
 import com.freedomotic.api.APIStandardImpl;
+import com.freedomotic.api.Plugin;
+import com.freedomotic.bus.BusMessagesListener;
 import com.freedomotic.bus.BusService;
 import com.freedomotic.bus.impl.BusServiceImpl;
 import com.freedomotic.environment.EnvironmentDAOXstream;
@@ -23,12 +25,8 @@ import com.freedomotic.security.AuthImpl;
 import com.freedomotic.util.I18n.I18n;
 import com.freedomotic.util.I18n.I18nImpl;
 import com.freedomotic.util.Info;
-import com.thoughtworks.xstream.converters.ConversionException;
 import java.io.File;
-import java.io.IOException;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -83,7 +81,7 @@ public class SpringConfig implements TransactionManagementConfigurer {
         appConfigImpl.load();
         return appConfigImpl;
     }
-    
+
     @Bean
     public Config config() {
         return new Config();
@@ -96,6 +94,12 @@ public class SpringConfig implements TransactionManagementConfigurer {
         return busServiceImpl;
     }
 
+//    @Bean
+//    public BusMessagesListener busMessagesListener() {
+//        BusMessagesListener listener = new BusMessagesListener(busService(), this);
+//        return listener;
+//    }
+
     @Bean
     public Auth auth() {
         return new AuthImpl();
@@ -105,7 +109,7 @@ public class SpringConfig implements TransactionManagementConfigurer {
     public TriggerPersistence triggerPersistence() {
         return new TriggerPersistence();
     }
-    
+
 //    @Bean
 //    public Config configPersistence(File manifest) {
 //        try {
@@ -117,10 +121,14 @@ public class SpringConfig implements TransactionManagementConfigurer {
 //        }
 //        return null;
 //    }
-
     @Bean
     public PluginsManager pluginsManager() {
         return new PluginsManagerImpl();
+    }
+    
+        @Bean
+    public Plugin plugin() {
+        return new Plugin();
     }
 
     @Bean
@@ -137,13 +145,13 @@ public class SpringConfig implements TransactionManagementConfigurer {
     public EnvironmentDAOXstream environmentDAO() {
         return new EnvironmentDAOXstream(new File(Info.PATH_DATA_FOLDER + "/furn/default/"));
     }
-    
-        @Bean
+
+    @Bean
     public EnvironmentPersistence environmentPersistence() {
         return new EnvironmentPersistence(clientStorage());
     }
-    
-            @Bean
+
+    @Bean
     public EnvObjectPersistence envObjectPersistence() {
         return new EnvObjectPersistence();
     }

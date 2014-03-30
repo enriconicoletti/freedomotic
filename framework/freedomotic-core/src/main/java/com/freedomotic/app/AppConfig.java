@@ -10,11 +10,13 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author enrico
  */
+@Component
 public interface AppConfig extends Serializable {
 
     /**

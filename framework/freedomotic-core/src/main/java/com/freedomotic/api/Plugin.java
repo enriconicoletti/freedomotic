@@ -19,8 +19,11 @@
  */
 package com.freedomotic.api;
 
+import com.freedomotic.app.ApplicationContextLocator;
 import com.freedomotic.app.ConfigPersistence;
 import com.freedomotic.app.Freedomotic;
+import com.freedomotic.bus.BusConsumer;
+import com.freedomotic.bus.BusMessagesListener;
 import com.freedomotic.bus.BusService;
 import com.freedomotic.events.PluginHasChanged;
 import com.freedomotic.events.PluginHasChanged.PluginActions;
@@ -30,20 +33,20 @@ import com.freedomotic.util.Info;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
+import javax.jms.ObjectMessage;
 import javax.swing.JFrame;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author nicoletti
  */
-public class Plugin
-        implements Client {
-//    private boolean isConnected = false;
+@Component
+public class Plugin implements Client, BusConsumer {
 
-    /**
-     *
-     */
     protected volatile boolean isRunning;
     private String pluginName;
     private String type = "Plugin";
@@ -62,9 +65,14 @@ public class Plugin
     @Autowired
     private API api;
     @Autowired
-    private BusService busService;
- 
+    protected BusService busService;
+    //@Autowired 
+    private BusMessagesListener listener;
+    //@Autowired 
+    //private AutowireCapableBeanFactory beanFactory;
     public Config configuration;
+
+    private static final String ACTUATORS_QUEUE_DOMAIN = "app.actuators.";
 
     /**
      *
@@ -74,7 +82,11 @@ public class Plugin
     public Plugin(String pluginName, String manifestPath) {
         this(pluginName);
         path = new File(Info.getDevicesPath() + manifestPath);
-        init(path);
+        loadConfiguration(path);
+    }
+
+    public Plugin() {
+
     }
 
     /**
@@ -84,7 +96,7 @@ public class Plugin
      */
     public Plugin(String pluginName, Config manifest) {
         this(pluginName);
-        init(manifest);
+        loadConfiguration(path);
     }
 
     /**
@@ -93,7 +105,7 @@ public class Plugin
      */
     public Plugin(String pluginName) {
         setName(pluginName);
-        this.busService = Freedomotic.INJECTOR.getInstance(BusService.class);
+        //this.busService = Freedomotic.INJECTOR.getInstance(BusService.class);
     }
 
     /**
@@ -136,7 +148,7 @@ public class Plugin
             PluginHasChanged event = new PluginHasChanged(this,
                     this.getName(),
                     PluginActions.DESCRIPTION);
-            busService.send(event);
+            //REGRESSION: busService.send(event);
         }
     }
 
@@ -328,19 +340,19 @@ public class Plugin
         return hash;
     }
 
-    private void init(File manifest) {
+    private void loadConfiguration(File manifest) {
         try {
-            configuration = ConfigPersistence.deserialize(manifest);
+            configuration = ConfigPersistence.deserialize(path);
         } catch (IOException ex) {
-            LOG.severe("Missing manifest " + manifest.toString() + " for plugin " + getName());
-            setDescription("Missing manifest file " + manifest.toString());
+            LOG.severe("Missing manifest " + path.toString() + " for plugin " + getName());
+            //setDescription("Missing manifest file " + path.toString());
         }
-
-        init(configuration);
-
     }
 
-    private void init(Config configuration) {
+    public void init() {
+        ApplicationContext context = ApplicationContextLocator.getApplicationContext();
+        AutowireCapableBeanFactory factory = context.getAutowireCapableBeanFactory();
+        factory.autowireBean(this);
         setDescription("No description");
         description = configuration.getStringProperty("description", "Missing plugin manifest");
         setDescription(description);
@@ -348,6 +360,33 @@ public class Plugin
         shortName = configuration.getStringProperty("short-name", "undefined");
         listenOn = configuration.getStringProperty("listen-on", "undefined");
         sendOn = configuration.getStringProperty("send-on", "undefined");
+        register();
+    }
+
+    private void register() {
+        listener = new BusMessagesListener(busService, this);
+        listener.consumeCommandFrom(getCommandsChannelToListen());
+    }
+
+    /**
+     *
+     * @param listento
+     */
+    public void addEventListener(String listento) {
+        listener.consumeEventFrom(listento);
+    }
+
+    private String getCommandsChannelToListen() {
+        String defaultQueue = ACTUATORS_QUEUE_DOMAIN + category + "." + shortName;
+        String customizedQueue = ACTUATORS_QUEUE_DOMAIN + listenOn;
+
+        if (getReadQueue().equalsIgnoreCase("undefined")) {
+            listenOn = defaultQueue + ".in";
+
+            return listenOn;
+        } else {
+            return customizedQueue;
+        }
     }
 
     /**
@@ -396,4 +435,9 @@ public class Plugin
         getApi().getAuth().setPluginPrivileges(this, configuration.getStringProperty("permissions", getApi().getAuth().getPluginDefaultPermission()));
     }
     private static final Logger LOG = Logger.getLogger(Plugin.class.getName());
+
+    @Override
+    public void onMessage(ObjectMessage message) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

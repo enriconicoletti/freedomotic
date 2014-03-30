@@ -22,6 +22,7 @@ package com.freedomotic.bus;
 import com.freedomotic.app.Freedomotic;
 import com.freedomotic.app.Profiler;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
@@ -30,6 +31,7 @@ import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link MessageListener} implementation (former AbstractBusConnector class)
@@ -49,11 +51,9 @@ public class BusMessagesListener implements MessageListener {
     private static final Logger LOG = Logger
             .getLogger(BusMessagesListener.class.getName());
 
-    @Autowired
+    //@Autowired
     private BusService busService;
-    @Autowired
     private BusConsumer busConsumer;
-    @Autowired
     private MessageConsumer messageConsumer;
 
     /**
@@ -61,11 +61,22 @@ public class BusMessagesListener implements MessageListener {
      *
      * @param busConsumer
      */
-    public BusMessagesListener(BusConsumer busConsumer) {
-
+    @Inject
+    public BusMessagesListener(BusService busService, BusConsumer busConsumer) {
         this.busConsumer = busConsumer;
-        this.busService = Freedomotic.INJECTOR.getInstance(BusService.class);
+        this.busService = busService;
     }
+
+//    public BusMessagesListener() {
+//    }
+//
+//    public void setBusConsumer(BusConsumer busConsumer) {
+//        this.busConsumer = busConsumer;
+//    }
+//
+//    public void setBusService(BusService busService) {
+//        this.busService = busService;
+//    }
 
     /**
      * Passes a message to the listener
@@ -131,31 +142,19 @@ public class BusMessagesListener implements MessageListener {
      * @param queueName Queue name
      */
     public void consumeEventFrom(String queueName) {
-
         try {
-
-            BusDestination busDestination = busService
-                    .registerEventQueue(queueName);
-
+            BusDestination busDestination = busService.registerEventQueue(queueName);
             registerOnQueue(busDestination);
-
         } catch (JMSException e) {
-
             LOG.severe(Freedomotic.getStackTraceInfo(e));
         }
     }
 
-    private void registerOnQueue(BusDestination destination)
-            throws JMSException {
-
+    private void registerOnQueue(BusDestination destination) throws JMSException {
         final Session receiveSession = busService.getReceiveSession();
-        messageConsumer = receiveSession.createConsumer(destination
-                .getDestination());
+        messageConsumer = receiveSession.createConsumer(destination.getDestination());
         messageConsumer.setMessageListener(this);
-
-        LOG.info(busConsumer.getClass().getSimpleName() + " listen on "
-                + destination.getDestinationName());
-
+        //LOG.info(busConsumer.getClass().getSimpleName() + " listen on " + destination.getDestinationName());
     }
 
     /**
@@ -169,10 +168,10 @@ public class BusMessagesListener implements MessageListener {
 
             messageConsumer.close();
 
-			// FIXME LCG Some unsuscribe invocations are pending 
-			// TODO Why is suppossed to be always suscribed within the
+            // FIXME LCG Some unsuscribe invocations are pending 
+            // TODO Why is suppossed to be always suscribed within the
             // receiveSession?
-			// BusService busService = BusService.getInstance();
+            // BusService busService = BusService.getInstance();
             // final Session receiveSession = busService.getReceiveSession();
             // receiveSession.unsubscribe(
             // ..retrieve channel from an internal list populated on
@@ -181,7 +180,7 @@ public class BusMessagesListener implements MessageListener {
 
             LOG.severe(e.getMessage());
 
-			// "Unable to unsubscribe from event channel "
+            // "Unable to unsubscribe from event channel "
             // + getChannelName());
         } catch (Exception e) {
 

@@ -45,18 +45,27 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Enrico
  */
-@Singleton
+@Component
 public final class TriggerCheck {
 
     private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
-    private final EnvironmentPersistence environmentPersistence;
-    private final BusService busService;
+    @Autowired
+    private EnvironmentPersistence environmentPersistence;
+    @Autowired
+    private BusService busService;
+    
 
+    public TriggerCheck(){
+        
+    }
+    
     @Inject
     TriggerCheck(EnvironmentPersistence environmentPersistence, BusService busService) {
         this.environmentPersistence = environmentPersistence;

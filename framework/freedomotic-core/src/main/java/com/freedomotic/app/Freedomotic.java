@@ -41,7 +41,6 @@ import com.freedomotic.marketplace.IPluginCategory;
 import com.freedomotic.marketplace.MarketPlaceService;
 import com.freedomotic.model.ds.ColorList;
 import com.freedomotic.model.environment.Environment;
-import com.freedomotic.objects.EnvObjectLogic;
 import com.freedomotic.objects.EnvObjectPersistence;
 import com.freedomotic.plugins.ClientStorage;
 import com.freedomotic.plugins.filesystem.PluginsManager;
@@ -49,8 +48,6 @@ import com.freedomotic.reactions.Command;
 import com.freedomotic.reactions.CommandPersistence;
 import com.freedomotic.reactions.ReactionPersistence;
 import com.freedomotic.reactions.TriggerPersistence;
-import com.freedomotic.repository.EnvObjectRepository;
-import com.freedomotic.repository.EnvironmentRepository;
 import com.freedomotic.security.Auth;
 import com.freedomotic.serial.SerialConnectionProvider;
 import com.freedomotic.util.Info;
@@ -108,7 +105,7 @@ public class Freedomotic implements BusConsumer {
      * Should NOT be used. Reserved for una tantum internal freedomotic core use
      * only!!
      */
-    public static final Injector INJECTOR = Guice.createInjector(new DependenciesInjector());
+    private static final Injector INJECTOR = Guice.createInjector(new DependenciesInjector());
     //dependencies
     @Autowired
     private EnvironmentDAO environmentDao;
@@ -122,13 +119,16 @@ public class Freedomotic implements BusConsumer {
     private Auth auth;
     @Autowired
     private API api;
-    private BusMessagesListener listener;
+    //@Autowired
+
     @Autowired
     private BusService busService;
     //@Autowired
     //private EnvironmentRepository envRepo;
     //@Autowired
     //private EnvObjectRepository objRepo;
+    private BusMessagesListener listener;
+
 
     /**
      *
@@ -170,11 +170,11 @@ public class Freedomotic implements BusConsumer {
         // Initialize bus here!
         //busService = INJECTOR.getInstance(BusService.class);
         //busService.init();
-
         // register listener
-        this.listener = new BusMessagesListener(this);
+        //this.listener = new BusMessagesListener(this);
         // this class is a BusConsumer too
         // listen for exit signal (an event) and call onExit method if received
+                listener = new BusMessagesListener(busService, this);
         listener.consumeEventFrom("app.event.system.exit");
 
         // Stop on initialization error.
@@ -185,8 +185,7 @@ public class Freedomotic implements BusConsumer {
         }
 
         // just for testing, don't mind it
-        new StompDispatcher();
-
+        //TODO: DISABLED new StompDispatcher();
         // TODO change this object to an enum and do init in another location.
         new ColorList(); //initialize an ordered list of colors used for various purposes, eg: people colors
 
@@ -370,7 +369,7 @@ public class Freedomotic implements BusConsumer {
         /**
          * A service to add environment objects using XML commands
          */
-        new BehaviorManager();
+        //new BehaviorManager();
         new SerialConnectionProvider();
 
         /**

@@ -20,9 +20,7 @@
 package com.freedomotic.api;
 
 import com.freedomotic.app.Freedomotic;
-import com.freedomotic.app.SpringConfig;
 import com.freedomotic.bus.BusConsumer;
-import com.freedomotic.bus.BusMessagesListener;
 import com.freedomotic.bus.BusService;
 import com.freedomotic.events.PluginHasChanged;
 import com.freedomotic.exceptions.UnableToExecuteException;
@@ -33,8 +31,6 @@ import java.util.logging.Logger;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * Uses a Template Method pattern which allows subclass to define how to perform
@@ -45,13 +41,9 @@ public abstract class Protocol
         implements BusConsumer {
 
     private static final Logger LOG = Logger.getLogger(Protocol.class.getName());
-    private static final String ACTUATORS_QUEUE_DOMAIN = "app.actuators.";
     private int pollingWaitTime = -1;
-    private BusMessagesListener listener;
     private Protocol.SensorThread sensorThread;
     private volatile Destination lastDestination;
-    @Autowired
-    private BusService busService;
 
     /**
      *
@@ -88,35 +80,10 @@ public abstract class Protocol
     public Protocol(String pluginName, String manifest) {
 
         super(pluginName, manifest);
-        this.busService = Freedomotic.INJECTOR.getInstance(BusService.class);
-        register();
+        //this.busService = Freedomotic.INJECTOR.getInstance(BusService.class);
     }
 
-    private void register() {
-        listener = new BusMessagesListener(this);
-        listener.consumeCommandFrom(getCommandsChannelToListen());
-    }
 
-    /**
-     *
-     * @param listento
-     */
-    public void addEventListener(String listento) {
-        listener.consumeEventFrom(listento);
-    }
-
-    private String getCommandsChannelToListen() {
-        String defaultQueue = ACTUATORS_QUEUE_DOMAIN + category + "." + shortName;
-        String customizedQueue = ACTUATORS_QUEUE_DOMAIN + listenOn;
-
-        if (getReadQueue().equalsIgnoreCase("undefined")) {
-            listenOn = defaultQueue + ".in";
-
-            return listenOn;
-        } else {
-            return customizedQueue;
-        }
-    }
 
     /**
      *

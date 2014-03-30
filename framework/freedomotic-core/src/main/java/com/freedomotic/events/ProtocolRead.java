@@ -31,6 +31,8 @@ import com.freedomotic.core.TriggerCheck;
 import com.freedomotic.reactions.Trigger;
 import com.google.inject.Inject;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Channel <b>app.event.sensor.protocol.read.PROTOCOL_NAME</b> informs about
@@ -38,12 +40,16 @@ import java.util.logging.Logger;
  *
  * @author Enrico
  */
-public final class ProtocolRead
-        extends EventTemplate {
+@Component
+public final class ProtocolRead extends EventTemplate {
 
     String protocol;
-    @Inject
+    @Autowired
     private TriggerCheck triggerCheck;
+    
+    public ProtocolRead() {
+        
+    }
 
     /**
      *
@@ -51,7 +57,6 @@ public final class ProtocolRead
      * @param protocol
      * @param address
      */
-    @Inject
     public ProtocolRead(Object source, String protocol, String address) {
         this.setSender(source);
         this.protocol = protocol;
@@ -66,7 +71,7 @@ public final class ProtocolRead
     @Override
     protected void generateEventPayload() {
         //this is not a good idea but it works for now
-        Freedomotic.INJECTOR.injectMembers(this);
+        //Freedomotic.INJECTOR.injectMembers(this);
     }
 
     /**

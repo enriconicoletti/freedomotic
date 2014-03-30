@@ -37,8 +37,6 @@ import com.freedomotic.reactions.Reaction;
 import com.freedomotic.reactions.ReactionPersistence;
 import com.freedomotic.reactions.Statement;
 import com.freedomotic.reactions.Trigger;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
@@ -46,31 +44,22 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Enrico
  */
-@Component
+@Service
 public final class TriggerCheck {
 
     private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
+    private static final Logger LOG = Logger.getLogger(TriggerCheck.class.getName());
     @Autowired
     private EnvironmentPersistence environmentPersistence;
     @Autowired
     private BusService busService;
     
-
-    public TriggerCheck(){
-        
-    }
-    
-    @Inject
-    TriggerCheck(EnvironmentPersistence environmentPersistence, BusService busService) {
-        this.environmentPersistence = environmentPersistence;
-        this.busService = busService;
-    }
 
     /**
      * Executes trigger-event comparison in a separated thread
@@ -316,5 +305,4 @@ public final class TriggerCheck {
 
         EXECUTOR.execute(automation);
     }
-    private static final Logger LOG = Logger.getLogger(TriggerCheck.class.getName());
 }

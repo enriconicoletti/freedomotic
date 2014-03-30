@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * An helper class that uses an internal DAO pattern to loadBoundle plugins of
@@ -39,15 +39,14 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
  *
  * @author enrico
  */
-public class PluginsManagerImpl implements PluginsManager {
+@Component
+class PluginsManagerImpl implements PluginsManager {
     //depedencies
 
     @Autowired
     private ClientStorage clientStorage;
     @Autowired
     private TriggerPersistence triggers;
-    @Autowired
-    private AutowireCapableBeanFactory autowireBeanFactory;
 
     @Inject
     public PluginsManagerImpl() {
@@ -116,7 +115,6 @@ public class PluginsManagerImpl implements PluginsManager {
             }
             if (client instanceof Plugin) {
                 Plugin p = (Plugin) client;
-                autowireBeanFactory.autowireBean(p);
                 p.loadPermissionsFromManifest();
                 if (p.getConfiguration().getBooleanProperty("enable-i18n", false)) {
                     p.getApi().getI18n().registerPluginBundleDir(p);

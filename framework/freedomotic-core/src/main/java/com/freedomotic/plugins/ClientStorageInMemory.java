@@ -21,7 +21,6 @@ package com.freedomotic.plugins;
 
 import com.freedomotic.api.Client;
 import com.freedomotic.api.Plugin;
-import com.freedomotic.app.Freedomotic;
 import com.freedomotic.bus.BusService;
 import com.freedomotic.events.PluginHasChanged;
 import com.freedomotic.events.PluginHasChanged.PluginActions;
@@ -65,11 +64,9 @@ public final class ClientStorageInMemory implements ClientStorage {
     public void add(Client c) {
         if (!clients.contains(c)) {
             if (isCompatible(c)) {
-                //force injection as this class is not built by guice
-                //Freedomotic.INJECTOR.injectMembers(c);
-
                 clients.add(c);
             } else {
+                //if this plugin is not compatible create a placeholder to inform the user
                 Client client =
                         createPluginPlaceholder(c.getName(),
                         "Plugin",
@@ -82,11 +79,8 @@ public final class ClientStorageInMemory implements ClientStorage {
             PluginHasChanged event =
                     new PluginHasChanged(ClientStorageInMemory.class,
                     c.getName(), PluginActions.ENQUEUE);
-            //final BusService busService = Freedomotic.INJECTOR.getInstance(BusService.class);
             busService.send(event);
-            LOG.log(Level.CONFIG,
-                    "{0} added to plugins list.",
-                    c.getName());
+            LOG.log(Level.CONFIG, "{0} added to plugins list.", c.getName());
         }
     }
 
@@ -102,7 +96,6 @@ public final class ClientStorageInMemory implements ClientStorage {
             PluginHasChanged event =
                     new PluginHasChanged(ClientStorageInMemory.class,
                     c.getName(), PluginActions.DEQUEUE);
-            //final BusService busService = Freedomotic.INJECTOR.getInstance(BusService.class);
             busService.send(event);
         }
     }

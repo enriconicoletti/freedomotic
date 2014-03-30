@@ -26,8 +26,6 @@ import com.freedomotic.bus.BootStatus;
 import com.freedomotic.bus.BusConsumer;
 import com.freedomotic.bus.BusMessagesListener;
 import com.freedomotic.bus.BusService;
-import com.freedomotic.bus.StompDispatcher;
-import com.freedomotic.core.BehaviorManager;
 import com.freedomotic.environment.EnvironmentDAO;
 import com.freedomotic.environment.EnvironmentLogic;
 import com.freedomotic.environment.EnvironmentPersistence;
@@ -52,8 +50,6 @@ import com.freedomotic.security.Auth;
 import com.freedomotic.serial.SerialConnectionProvider;
 import com.freedomotic.util.Info;
 import com.freedomotic.util.LogFormatter;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -96,17 +92,15 @@ public class Freedomotic implements BusConsumer {
     //this should replace Freedomotic.logger reference
     private static final Logger LOG = Logger.getLogger(Freedomotic.class.getName());
     private static String INSTANCE_ID;
+    private static ArrayList<IPluginCategory> onlinePluginCategories;
 
     /**
-     *
+     * @return the onlinePluginCategories
      */
-    public static ArrayList<IPluginCategory> onlinePluginCategories;
-    /**
-     * Should NOT be used. Reserved for una tantum internal freedomotic core use
-     * only!!
-     */
-    private static final Injector INJECTOR = Guice.createInjector(new DependenciesInjector());
-    //dependencies
+    public static ArrayList<IPluginCategory> getOnlinePluginCategories() {
+        return onlinePluginCategories;
+    }
+
     @Autowired
     private EnvironmentDAO environmentDao;
     @Autowired
@@ -119,8 +113,6 @@ public class Freedomotic implements BusConsumer {
     private Auth auth;
     @Autowired
     private API api;
-    //@Autowired
-
     @Autowired
     private BusService busService;
     //@Autowired
@@ -128,7 +120,6 @@ public class Freedomotic implements BusConsumer {
     //@Autowired
     //private EnvObjectRepository objRepo;
     private BusMessagesListener listener;
-
 
     /**
      *
@@ -174,7 +165,7 @@ public class Freedomotic implements BusConsumer {
         //this.listener = new BusMessagesListener(this);
         // this class is a BusConsumer too
         // listen for exit signal (an event) and call onExit method if received
-                listener = new BusMessagesListener(busService, this);
+        listener = new BusMessagesListener(busService, this);
         listener.consumeEventFrom("app.event.system.exit");
 
         // Stop on initialization error.
@@ -310,7 +301,7 @@ public class Freedomotic implements BusConsumer {
                                 LOG.info("Starting marketplace service");
 
                                 MarketPlaceService mps = MarketPlaceService.getInstance();
-                                onlinePluginCategories = mps.getCategoryList();
+                                setOnlinePluginCategories(mps.getCategoryList());
                             }
                         }).start();
                     }
@@ -442,7 +433,7 @@ public class Freedomotic implements BusConsumer {
                 throw new IllegalStateException("Object data cannot be null at this stage");
             }
             for (Environment env : loaded) {
-                EnvironmentLogic logic = INJECTOR.getInstance(EnvironmentLogic.class);
+                EnvironmentLogic logic = new EnvironmentLogic();//INJECTOR.getInstance(EnvironmentLogic.class);
                 logic.setPojo(env);
                 logic.setSource(new File(folder + "/" + env.getUuid() + ".xenv"));
                 EnvironmentPersistence.add(logic, false);
@@ -632,6 +623,13 @@ public class Freedomotic implements BusConsumer {
     public static void kill(int status) {
 
         System.exit(status);
+    }
+
+    /**
+     * @param aOnlinePluginCategories the onlinePluginCategories to set
+     */
+    public static void setOnlinePluginCategories(ArrayList<IPluginCategory> aOnlinePluginCategories) {
+        onlinePluginCategories = aOnlinePluginCategories;
     }
 
     /**

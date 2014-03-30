@@ -47,6 +47,7 @@ import java.util.List;
  *
  * @author enrico
  */
+//TODO: move to model
 public final class Reaction
         implements Serializable {
 

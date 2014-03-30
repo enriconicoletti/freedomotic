@@ -24,22 +24,16 @@ import com.freedomotic.exceptions.DaoLayerException;
 import com.freedomotic.model.object.EnvObject;
 import java.net.URLClassLoader;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Enrico
  */
 //@Configurable(autowire = Autowire.BY_TYPE)
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
-@Component
+//@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+//@Component
 public final class EnvObjectFactory {
-
-    //@Autowired
-    //private AutowireCapableBeanFactory beanFactory;
 
     public EnvObjectFactory() {
         // Suppress default constructor for noninstantiability

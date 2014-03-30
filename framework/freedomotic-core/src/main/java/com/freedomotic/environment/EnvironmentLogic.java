@@ -19,7 +19,6 @@
  */
 package com.freedomotic.environment;
 
-import com.freedomotic.api.API;
 import com.freedomotic.app.Freedomotic;
 import com.freedomotic.model.environment.Environment;
 import com.freedomotic.model.environment.Zone;
@@ -29,16 +28,13 @@ import com.freedomotic.objects.EnvObjectPersistence;
 import com.freedomotic.objects.impl.Gate;
 import com.freedomotic.util.Graph;
 import com.freedomotic.util.UidGenerator;
-import com.google.inject.Inject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,23 +44,10 @@ import org.springframework.stereotype.Component;
 @Component
 public final class EnvironmentLogic {
 
-    private Graph graph = null;
+    private Graph graph;
     private Environment pojo = null;
     private List<ZoneLogic> zones = new ArrayList<ZoneLogic>();
-    private File source = null;
-
-
-    public EnvironmentLogic() {
-    }
-
-    /**
-     *
-     * @param api
-     */
-    @Inject
-    public EnvironmentLogic(API api) {
-
-    }
+    private File source;
 
     /**
      *
@@ -311,6 +294,5 @@ public final class EnvironmentLogic {
     public String toString() {
         return this.getPojo().getName();
     }
-    private static final Logger LOG = Logger.getLogger(EnvironmentLogic.class.getName());
 
 }

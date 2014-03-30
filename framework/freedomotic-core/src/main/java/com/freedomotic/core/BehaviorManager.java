@@ -35,11 +35,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.PostConstruct;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * Translates a generic request like 'turn on light 1' into a series of hardware
@@ -55,8 +57,8 @@ import org.springframework.stereotype.Component;
  *
  * @author Enrico
  */
-public final class BehaviorManager
-        implements BusConsumer {
+@Service
+public final class BehaviorManager implements BusConsumer {
 
     private static final Logger LOG = Logger.getLogger(BehaviorManager.class.getName());
     private static final String MESSAGING_CHANNEL = "app.events.sensors.behavior.request.objects";
@@ -76,16 +78,9 @@ public final class BehaviorManager
     }
 
     /**
-     *
-     */
-    public BehaviorManager() {
-        //this.busService = Freedomotic.INJECTOR.getInstance(BusService.class);
-        register();
-    }
-
-    /**
      * Register one or more channels to listen to
      */
+    @PostConstruct
     private void register() {
         listener = new BusMessagesListener(busService, this);
         listener.consumeCommandFrom(getMessagingChannel());

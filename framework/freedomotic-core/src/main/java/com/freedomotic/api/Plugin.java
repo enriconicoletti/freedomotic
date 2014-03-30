@@ -21,7 +21,6 @@ package com.freedomotic.api;
 
 import com.freedomotic.app.ApplicationContextLocator;
 import com.freedomotic.app.ConfigPersistence;
-import com.freedomotic.app.Freedomotic;
 import com.freedomotic.bus.BusConsumer;
 import com.freedomotic.bus.BusMessagesListener;
 import com.freedomotic.bus.BusService;
@@ -342,10 +341,9 @@ public class Plugin implements Client, BusConsumer {
 
     private void loadConfiguration(File manifest) {
         try {
-            configuration = ConfigPersistence.deserialize(path);
+            configuration = ConfigPersistence.deserialize(manifest);
         } catch (IOException ex) {
-            LOG.severe("Missing manifest " + path.toString() + " for plugin " + getName());
-            //setDescription("Missing manifest file " + path.toString());
+            LOG.severe("Missing manifest " + manifest.toString() + " for plugin " + getName());
         }
     }
 

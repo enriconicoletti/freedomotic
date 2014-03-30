@@ -20,7 +20,6 @@
 package com.freedomotic.environment;
 
 import com.freedomotic.api.Client;
-import com.freedomotic.app.Freedomotic;
 import com.freedomotic.exceptions.DaoLayerException;
 import com.freedomotic.model.environment.Environment;
 import com.freedomotic.model.environment.Zone;
@@ -52,7 +51,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 /**
  *
@@ -79,6 +77,7 @@ public final class EnvironmentPersistence {
      * @param folder
      * @throws DaoLayerException
      */
+    @Deprecated
     @RequiresPermissions("environments:save")
     public static void saveEnvironmentsToFolder(File folder) throws DaoLayerException {
         if (environments.isEmpty()) {
@@ -391,6 +390,7 @@ public final class EnvironmentPersistence {
      * @param folder
      * @throws IOException
      */
+    @Deprecated
     @RequiresPermissions("environments:save")
     public static void saveAs(EnvironmentLogic env, File folder) throws IOException {
         LOG.config("Serializing new environment to " + folder);

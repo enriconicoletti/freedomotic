@@ -4,11 +4,8 @@
  */
 package com.freedomotic.plugins.filesystem;
 
-import com.freedomotic.app.DependenciesInjector;
 import com.freedomotic.app.Freedomotic;
 import com.freedomotic.util.Info;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,10 +27,6 @@ class BoundleLoaderFactory {
     // Parameters
 
     private static final Class[] PARAMETERS = new Class[]{URL.class};
-    //This is the second INJECTOR of freedomotic. It is needed to inject
-    //the plugins loaded using the classloader, so we have to force injection
-    //it's package protected to not make it visible from outside
-    protected static final Injector injector = Guice.createInjector(new DependenciesInjector());
 
     /**
      * Takes in input the type of the plugins and from this creates a pointer to the right 

@@ -21,7 +21,6 @@ package com.freedomotic.reactions;
 
 import com.freedomotic.api.EventTemplate;
 import com.freedomotic.app.ApplicationContextLocator;
-import com.freedomotic.app.Freedomotic;
 import com.freedomotic.app.Profiler;
 import com.freedomotic.bus.BusConsumer;
 import com.freedomotic.bus.BusMessagesListener;
@@ -38,16 +37,13 @@ import javax.jms.JMSException;
 import javax.jms.ObjectMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  *
  * @author enrico
  */
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Component
 public final class Trigger implements BusConsumer, Cloneable {
 

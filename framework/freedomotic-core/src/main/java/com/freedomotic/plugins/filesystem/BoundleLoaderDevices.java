@@ -11,9 +11,6 @@ import com.freedomotic.util.JarFilter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,9 +18,8 @@ import org.springframework.stereotype.Component;
  * @author enrico
  */
 @Component
-public class BoundleLoaderDevices implements BoundleLoader {
+class BoundleLoaderDevices implements BoundleLoader {
 
-    private static final Logger LOG = Logger.getLogger(BoundleLoaderDevices.class.getName());
     private File path;
     
     BoundleLoaderDevices(){

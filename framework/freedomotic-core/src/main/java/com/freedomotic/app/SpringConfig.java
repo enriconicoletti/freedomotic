@@ -8,7 +8,6 @@ package com.freedomotic.app;
 import com.freedomotic.api.API;
 import com.freedomotic.api.APIStandardImpl;
 import com.freedomotic.api.Plugin;
-import com.freedomotic.bus.BusMessagesListener;
 import com.freedomotic.bus.BusService;
 import com.freedomotic.bus.impl.BusServiceImpl;
 import com.freedomotic.environment.EnvironmentDAOXstream;
@@ -17,8 +16,6 @@ import com.freedomotic.model.ds.Config;
 import com.freedomotic.objects.EnvObjectPersistence;
 import com.freedomotic.plugins.ClientStorage;
 import com.freedomotic.plugins.ClientStorageInMemory;
-import com.freedomotic.plugins.filesystem.PluginsManager;
-import com.freedomotic.plugins.filesystem.PluginsManagerImpl;
 import com.freedomotic.reactions.TriggerPersistence;
 import com.freedomotic.security.Auth;
 import com.freedomotic.security.AuthImpl;
@@ -121,10 +118,10 @@ public class SpringConfig implements TransactionManagementConfigurer {
 //        }
 //        return null;
 //    }
-    @Bean
-    public PluginsManager pluginsManager() {
-        return new PluginsManagerImpl();
-    }
+//    @Bean
+//    public PluginsManager pluginsManager() {
+//        return new PluginsManagerImpl();
+//    }
     
         @Bean
     public Plugin plugin() {

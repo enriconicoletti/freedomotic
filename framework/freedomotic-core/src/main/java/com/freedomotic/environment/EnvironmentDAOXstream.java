@@ -44,8 +44,7 @@ import java.util.logging.Logger;
  *
  * @author enrico
  */
-public class EnvironmentDAOXstream
-        implements EnvironmentDAO {
+public class EnvironmentDAOXstream implements EnvironmentDAO {
 
     private File directory;
     private boolean savedAsNewEnvironment;

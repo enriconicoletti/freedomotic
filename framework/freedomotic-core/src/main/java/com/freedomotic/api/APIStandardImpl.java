@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author enrico
  */
-
 public class APIStandardImpl implements API {
 
     @Autowired
@@ -50,36 +49,8 @@ public class APIStandardImpl implements API {
 
     }
 
-//    /**
-//     *
-//     * @param environment
-//     * @param object
-//     * @param clientStorage
-//     * @param config
-//     * @param auth
-//     * @param i18n
-//     * @param plugManager
-//     */
-//    @Inject
-//    public APIStandardImpl(
-//            EnvironmentPersistence environment,
-//            EnvObjectPersistence object,
-//            ClientStorage clientStorage,
-//            AppConfig config,
-//            Auth auth,
-//            I18n i18n,
-//            PluginsManager plugManager) {
-//        this.environment = environment;
-//        this.object = object;
-//        this.clientStorage = clientStorage;
-//        this.config = config;
-//        this.auth = auth;
-//        this.i18n = i18n;
-//        this.plugManager = plugManager;
-//        System.out.println("auth in apiimpl is " + this.auth);
-//    }
-
     /**
+     * {@inheritDoc}
      *
      * @return
      */
@@ -89,6 +60,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param obj
      * @param MAKE_UNIQUE
@@ -100,6 +72,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @return
      */
@@ -110,6 +83,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param name
      * @return
@@ -120,6 +94,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param uuid
      * @return
@@ -130,6 +105,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param protocol
      * @param address
@@ -141,6 +117,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param protocol
      * @return
@@ -151,6 +128,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param uuid
      * @return
@@ -161,6 +139,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param input
      */
@@ -170,6 +149,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param obj
      * @param MAKE_UNIQUE
@@ -181,6 +161,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @return
      */
@@ -190,6 +171,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param UUID
      * @return
@@ -200,6 +182,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param input
      */
@@ -209,6 +192,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param filter
      * @return
@@ -219,6 +203,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @return
      */
@@ -232,6 +217,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @return
      */
@@ -241,6 +227,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @return
      */
@@ -250,6 +237,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @return
      */
@@ -259,6 +247,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @return
      */
@@ -268,6 +257,7 @@ public class APIStandardImpl implements API {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param tag
      * @return

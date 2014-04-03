@@ -1,22 +1,20 @@
 /**
  *
- * Copyright (c) 2009-2013 Freedomotic team
- * http://freedomotic.com
+ * Copyright (c) 2009-2013 Freedomotic team http://freedomotic.com
  *
  * This file is part of Freedomotic
  *
- * This Program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * This Program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2, or (at your option) any later version.
  *
- * This Program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This Program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Freedomotic; see the file COPYING.  If not, see
+ * You should have received a copy of the GNU General Public License along with
+ * Freedomotic; see the file COPYING. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 package com.freedomotic.plugins;
@@ -32,19 +30,16 @@ import java.util.List;
  * @author enrico
  */
 public interface ClientStorage {
-    /*
-     * Checks if a plugin is already installed, if is an obsolete or newer
-     * version
-     */
 
     /**
+     * Compares two string versions (eg: 5.4.x) and returns the oldest one
      *
-     * @param name
-     * @param version
-     * @return
+     * @param versionA first version string 5.3.0
+     * @param versionB second version string 5.3.1
+     * @return -1 if versionA is older then versionB, 0 if versionA equals
+     * versionB, 1 if versionB is older then versionA
      */
-    
-    int compareVersions(String name, String version);
+    int compareVersions(String versionA, String versionB);
 
     /**
      *
@@ -52,8 +47,7 @@ public interface ClientStorage {
      * @return
      * @throws DaoLayerException
      */
-    Client createObjectPlaceholder(final File template)
-            throws DaoLayerException;
+    Client createObjectPlaceholder(final File template) throws DaoLayerException;
 
     /**
      * Creates a placeholder plugin and adds it to the list of loaded plugins.

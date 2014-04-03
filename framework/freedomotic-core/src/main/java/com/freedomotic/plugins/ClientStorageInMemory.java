@@ -48,15 +48,8 @@ public final class ClientStorageInMemory implements ClientStorage {
     @Autowired
     private BusService busService;
 
-
     /**
-     *
-     */
-    public ClientStorageInMemory() {
-        //just injected
-    }
-
-    /**
+     * {@inheritDoc}
      *
      * @param c
      */
@@ -67,24 +60,25 @@ public final class ClientStorageInMemory implements ClientStorage {
                 clients.add(c);
             } else {
                 //if this plugin is not compatible create a placeholder to inform the user
-                Client client =
-                        createPluginPlaceholder(c.getName(),
-                        "Plugin",
-                        "Not compatible with this framework version v" + Info.getVersion());
+                Client client
+                        = createPluginPlaceholder(c.getName(),
+                                "Plugin",
+                                "Not compatible with this framework version v" + Info.getVersion());
                 clients.add(client);
-                LOG.log(Level.WARNING, "Plugin {0} is not compatible with this framework version v{1}", 
+                LOG.log(Level.WARNING, "Plugin {0} is not compatible with this framework version v{1}",
                         new Object[]{c.getName(), Info.getVersion()});
             }
 
-            PluginHasChanged event =
-                    new PluginHasChanged(ClientStorageInMemory.class,
-                    c.getName(), PluginActions.ENQUEUE);
+            PluginHasChanged event
+                    = new PluginHasChanged(ClientStorageInMemory.class,
+                            c.getName(), PluginActions.ENQUEUE);
             busService.send(event);
             LOG.log(Level.CONFIG, "{0} added to plugins list.", c.getName());
         }
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param c
      */
@@ -93,14 +87,15 @@ public final class ClientStorageInMemory implements ClientStorage {
         if (clients.contains(c)) {
             clients.remove(c);
 
-            PluginHasChanged event =
-                    new PluginHasChanged(ClientStorageInMemory.class,
-                    c.getName(), PluginActions.DEQUEUE);
+            PluginHasChanged event
+                    = new PluginHasChanged(ClientStorageInMemory.class,
+                            c.getName(), PluginActions.DEQUEUE);
             busService.send(event);
         }
     }
 
     /**
+     * {@inheritDoc}
      *
      * @return
      */
@@ -113,6 +108,7 @@ public final class ClientStorageInMemory implements ClientStorage {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param name
      * @return
@@ -129,6 +125,7 @@ public final class ClientStorageInMemory implements ClientStorage {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param filterType
      * @return
@@ -149,6 +146,7 @@ public final class ClientStorageInMemory implements ClientStorage {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param protocol
      * @return
@@ -165,6 +163,7 @@ public final class ClientStorageInMemory implements ClientStorage {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param input
      * @return
@@ -178,18 +177,13 @@ public final class ClientStorageInMemory implements ClientStorage {
         return clients.contains(input);
     }
 
-    /*
-     * Checks if a plugin is already installed, if is an obsolete or newer
-     * version
-     */
-
     /**
+     * {@inheritDoc}
      *
      * @param name
      * @param version
      * @return
      */
-    
     @Override
     public int compareVersions(String name, String version) {
         Client client = get(name);
@@ -212,6 +206,7 @@ public final class ClientStorageInMemory implements ClientStorage {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param client
      * @return
@@ -225,7 +220,6 @@ public final class ClientStorageInMemory implements ClientStorage {
 
         //checking framework version compatibility
         //required version must be older (or equal) then current version
-
         if (requiredMajor == Info.getMajor()) {
             if ((getOldestVersion(requiredMajor + "." + requiredMinor + "." + requiredBuild,
                     Info.getVersion()) <= 0)) {
@@ -245,10 +239,10 @@ public final class ClientStorageInMemory implements ClientStorage {
             if (properties.getProperty(key).equalsIgnoreCase("x")) {
                 value = 0;
             } else {
-                value =
-                        Integer.parseInt(properties.getProperty(
-                        key,
-                        new Integer(Integer.MAX_VALUE).toString()));
+                value
+                        = Integer.parseInt(properties.getProperty(
+                                        key,
+                                        new Integer(Integer.MAX_VALUE).toString()));
             }
 
             return value;
@@ -258,13 +252,8 @@ public final class ClientStorageInMemory implements ClientStorage {
     }
 
     /**
-     * Calculates the oldest version between two version string
-     * MAJOR.MINOR.BUILD (eg: 5.3.1)
+     *      * {@inheritDoc}
      *
-     * @param str1 first version string 5.3.0
-     * @param str2 second version string 5.3.1
-     * @return -1 if str1 is older then str2, 0 if str1 equals str2, 1 if str2
-     * is older then str1
      */
     private int getOldestVersion(String str1, String str2) {
         //System.out.println("VERSION: " + str1 + " - " + str2);
@@ -292,60 +281,52 @@ public final class ClientStorageInMemory implements ClientStorage {
     }
 
     /**
-     * Creates a placeholder plugin and adds it to the list of loaded plugins.
-     * This plugin is just a mock object to inform the user that an object with
-     * complete features is expected here. It can be used for example to list a
-     * fake plugin that informs the user the real plugin cannot be loaded.
-     *
-     * @param simpleName
-     * @param type
-     * @param description
-     * @return
+     * {@inheritDoc}
      */
     @Override
     public Plugin createPluginPlaceholder(final String simpleName, final String type, final String description) {
-        final Plugin placeholder =
-                new Plugin(simpleName) {
-            @Override
-            public String getDescription() {
-                if (description == null) {
-                    return "Plugin Unavailable. Error on loading";
-                } else {
-                    return description;
-                }
-            }
+        final Plugin placeholder
+                = new Plugin(simpleName) {
+                    @Override
+                    public String getDescription() {
+                        if (description == null) {
+                            return "Plugin Unavailable. Error on loading";
+                        } else {
+                            return description;
+                        }
+                    }
 
-            @Override
-            public String getName() {
-                return "Cannot start " + simpleName;
-            }
+                    @Override
+                    public String getName() {
+                        return "Cannot start " + simpleName;
+                    }
 
-            @Override
-            public String getType() {
-                return type;
-            }
+                    @Override
+                    public String getType() {
+                        return type;
+                    }
 
-            @Override
-            public void start() {
-            }
+                    @Override
+                    public void start() {
+                    }
 
-            @Override
-            public void stop() {
-            }
+                    @Override
+                    public void stop() {
+                    }
 
-            @Override
-            public boolean isRunning() {
-                return false;
-            }
+                    @Override
+                    public boolean isRunning() {
+                        return false;
+                    }
 
-            @Override
-            public void showGui() {
-            }
+                    @Override
+                    public void showGui() {
+                    }
 
-            @Override
-            public void hideGui() {
-            }
-        };
+                    @Override
+                    public void hideGui() {
+                    }
+                };
 
         placeholder.setDescription(description);
         placeholder.configuration = new Config();
@@ -354,6 +335,7 @@ public final class ClientStorageInMemory implements ClientStorage {
     }
 
     /**
+     * {@inheritDoc}
      *
      * @param template
      * @return

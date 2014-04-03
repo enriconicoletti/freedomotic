@@ -20,160 +20,181 @@ import java.util.List;
  * @author enrico
  */
 public interface API {
-    //Configuration APi
 
     /**
+     * Get the plugin configuration
      *
      * @return
      */
-    
-    AppConfig getConfig();
+    public AppConfig getConfig();
 
     /**
+     * Get authorization and authentication settings
      *
      * @return
      */
-    Auth getAuth();
-    
+    public Auth getAuth();
+
     /**
+     * Get internationalization module
      *
      * @return
      */
-    I18n getI18n();
-
-    //Object API
-    //create
+    public I18n getI18n();
 
     /**
+     * Add an object to the current active environment
      *
      * @param obj
      * @param MAKE_UNIQUE
      * @return
      */
-        EnvObjectLogic addObject(final EnvObjectLogic obj, final boolean MAKE_UNIQUE);
+    public EnvObjectLogic addObject(final EnvObjectLogic obj, final boolean MAKE_UNIQUE);
 
     /**
+     * Get the list of loaded freedomotic extensions. Extensions are composed by
+     * java dynamically loaded plugins and remotely connected clients developed
+     * in languages different from Java.
      *
      * @return
      */
-    ClientStorage getClientStorage();
-    //read
+    public ClientStorage getClientStorage();
 
     /**
+     * Get the list of objects contained in all environments, not just the
+     * active one.
      *
      * @return
      */
-    Collection<EnvObjectLogic> getObjectList();
+    public Collection<EnvObjectLogic> getObjectList();
 
     /**
+     * Get an object using it's name as an identifier. Freedomotic guarantees
+     * that cannot be two objects with the same name. Matching is case
+     * insensitive.
      *
      * @param name
      * @return
      */
-    EnvObjectLogic getObjectByName(String name);
+    public EnvObjectLogic getObjectByName(String name);
 
     /**
+     * Get an object reverence using it's global ID
      *
      * @param uuid
      * @return
      */
-    EnvObjectLogic getObjectByUUID(String uuid);
+    public EnvObjectLogic getObjectByUUID(String uuid);
 
     /**
+     * Get a lost of objects sharing the same tag
      *
      * @param tag
      * @return
      */
-    Collection<EnvObjectLogic> getObjectByTag(String tag);
+    public Collection<EnvObjectLogic> getObjectByTag(String tag);
 
     /**
+     * Get an single object using protocol+address to identify it uniquely.
+     * Cannot exists two object with the same protocol+address.
      *
      * @param protocol
      * @param address
      * @return
      */
-    Collection<EnvObjectLogic> getObjectByAddress(String protocol, String address);
+    public Collection<EnvObjectLogic> getObjectByAddress(String protocol, String address);
 
     /**
+     * Get all objects driven by a particular protocol. Protocol is a free-form
+     * string declared by the related protocol plugin itself, check it's
+     * configuration to know the exact string name.
      *
      * @param protocol
      * @return
      */
-    Collection<EnvObjectLogic> getObjectByProtocol(String protocol);
+    public Collection<EnvObjectLogic> getObjectByProtocol(String protocol);
 
     /**
+     * Get the list of object in the environment specified using a global ID
      *
      * @param uuid
      * @return
      */
-    Collection<EnvObjectLogic> getObjectByEnvironment(String uuid);
-
-    //delete
+    public Collection<EnvObjectLogic> getObjectByEnvironment(String uuid);
 
     /**
+     * Remove an object from the global list of loaded objects. It is removed
+     * from any environment, not just the current active one
      *
      * @param input
      */
-        void removeObject(EnvObjectLogic input);
-
-    //Environment API
-    //create
+    public void removeObject(EnvObjectLogic input);
 
     /**
+     * Add a new environment (eg: a floor on the map)
      *
      * @param obj
      * @param MAKE_UNIQUE
      * @return
      */
-        EnvironmentLogic addEnvironment(final EnvironmentLogic obj, boolean MAKE_UNIQUE);
-
-    //read
+    public EnvironmentLogic addEnvironment(final EnvironmentLogic obj, boolean MAKE_UNIQUE);
 
     /**
+     * Get the list of loaded environments (eg: list of floors on the map)
      *
      * @return
      */
-        List<EnvironmentLogic> getEnvironments();
+    public List<EnvironmentLogic> getEnvironments();
 
     /**
+     * Get an environment using it's global id as an identifier
      *
      * @param UUID
      * @return
      */
-    EnvironmentLogic getEnvByUUID(String UUID);
-
-    //delete
+    public EnvironmentLogic getEnvByUUID(String UUID);
 
     /**
+     * Remove an environment from the list
      *
      * @param input
      */
-        void removeEnvironment(EnvironmentLogic input);
+    public void removeEnvironment(EnvironmentLogic input);
 
     /**
+     * Get the list of loaded clients. A client can be a freedomotic java
+     * extension (plugin) or any remotely connected software.
      *
      * @return
      */
-    Collection<Client> getClients();
+    public Collection<Client> getClients();
 
     /**
+     * Get a list of clients filtering by type. Valid types are 'plugin',
+     * 'object', 'event'
      *
      * @param filter
      * @return
      */
-    Collection<Client> getClients(String filter);
-    
+    public Collection<Client> getClients(String filter);
+
     /**
+     * Get the plugin manager, which can be used to manipulate the client list.
+     * It's usage it's discouraged.
      *
      * @return
      */
-    PluginsManager getPluginManager();
+    public PluginsManager getPluginManager();
 
-    //Resources API
     /**
+     * Get a resource like a image stored in the freedomotic data/resources
+     * folder. Resources are classpath loaded (by name) regardless the folder in
+     * which they are stored. Be sure to not have two resources with the same
+     * name. It's a good practice to append a namespace in at the beginning of
+     * the file name like it.freedomotic.icons.myimage.png
      *
      * @param resourceIdentifier
      * @return
      */
-    BufferedImage getResource(String resourceIdentifier);
+    public BufferedImage getResource(String resourceIdentifier);
 }

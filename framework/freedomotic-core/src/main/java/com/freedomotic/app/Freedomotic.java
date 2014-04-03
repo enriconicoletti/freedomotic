@@ -158,11 +158,6 @@ public class Freedomotic implements BusConsumer {
                 + System.getProperty("user.dir") + "\n" + "Java Version: " + System.getProperty("java.version")
                 + "\n" + "Resources Path: " + resourcesPath);
 
-        // Initialize bus here!
-        //busService = INJECTOR.getInstance(BusService.class);
-        //busService.init();
-        // register listener
-        //this.listener = new BusMessagesListener(this);
         // this class is a BusConsumer too
         // listen for exit signal (an event) and call onExit method if received
         listener = new BusMessagesListener(busService, this);
@@ -171,7 +166,6 @@ public class Freedomotic implements BusConsumer {
         // Stop on initialization error.
         final BootStatus currentStatus = BootStatus.getCurrentStatus();
         if (!BootStatus.STARTED.equals(currentStatus)) {
-
             kill(currentStatus.getCode());
         }
 
@@ -212,18 +206,6 @@ public class Freedomotic implements BusConsumer {
 
         /**
          * ******************************************************************
-         * Create data backup folder (FEATURE DISABLED!!!)
-         * *****************************************************************
-         */
-//        if (getConfig().getBooleanProperty("KEY_BACKUP_DATA_BEFORE_START", true) == true) {
-//            try {
-//                CopyFile.copy(new File(Info.getDatafilePath()), new File(Info.getApplicationPath() + "/backup"));
-//            } catch (Exception ex) {
-//                logger.warning("unable to save a backup copy of application data " + getStackTraceInfo(ex));
-//            }
-//        }
-        /**
-         * ******************************************************************
          * Shows the freedomotic website if stated in the config file
          * *****************************************************************
          */
@@ -249,6 +231,7 @@ public class Freedomotic implements BusConsumer {
                     "Cannot load event plugin {0}. {1}",
                     new Object[]{ex.getPluginName(), ex.getMessage()});
         }
+        
         /* ******************************************************************
          * Loads sensors and actuators This must be loaded before object
          * deserialization because objects can user hardware level commands and
@@ -316,16 +299,6 @@ public class Freedomotic implements BusConsumer {
          * Deserialize the default environment (its shape + zones)
          * *****************************************************************
          */
-        /**
-         *
-         *
-         * /**
-         * ******************************************************************
-         * Deserialize objects from XML
-         * *****************************************************************
-         */
-        // REMOVED: now it's up to EnvironmentPersistence to load objects.
-        // EnvObjectPersistence.loadObjects(EnvironmentPersistence.getEnvironments().get(0).getObjectFolder(), false);
         loadDefaultEnvironment();
 
         /**

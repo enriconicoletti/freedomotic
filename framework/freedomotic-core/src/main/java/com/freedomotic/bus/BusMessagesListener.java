@@ -30,8 +30,6 @@ import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * {@link MessageListener} implementation (former AbstractBusConnector class)

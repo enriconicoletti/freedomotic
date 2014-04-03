@@ -472,8 +472,9 @@ public class Freedomotic implements BusConsumer {
      *
      * @param event
      */
+    @Deprecated
     public static void sendEvent(EventTemplate event) {
-        //
+        throw new UnsupportedOperationException("Freedomotic.sendEvent() is deprecated and no more working, use just notifyEvent(event)");
     }
 
     // FIXME This shouldn't be done through this method
@@ -482,8 +483,9 @@ public class Freedomotic implements BusConsumer {
      * @param command
      * @return
      */
+    @Deprecated
     public static Command sendCommand(final Command command) {
-        return null;
+        throw new UnsupportedOperationException("Freedomotic.sendCommand() is deprecated and no more working");
     }
 
     /**

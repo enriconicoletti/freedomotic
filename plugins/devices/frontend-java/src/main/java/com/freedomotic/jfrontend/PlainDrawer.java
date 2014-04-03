@@ -4,7 +4,6 @@
  */
 package com.freedomotic.jfrontend;
 
-import com.freedomotic.app.Freedomotic;
 import com.freedomotic.environment.ZoneLogic;
 import com.freedomotic.events.ObjectReceiveClick;
 import com.freedomotic.model.geometry.FreedomPoint;
@@ -35,12 +34,15 @@ public class PlainDrawer
     private int ENVIRONMENT_SHADOW_OFFSET = 10;
     private Color ENVIRONMENT_SHADOW_COLOR = backgroundColor.darker();
 
+    JavaDesktopFrontend master;
+
     /**
      *
      * @param master
      */
     public PlainDrawer(JavaDesktopFrontend master) {
         super(master);
+        this.master = master;
     }
 
     /**
@@ -84,23 +86,23 @@ public class PlainDrawer
         getContext().translate(-offset, -offset);
 
         //external border of perimetral wall
-        final BasicStroke stroke4 =
-                new BasicStroke(PERIMETRAL_WALLS_TICKNESS, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER);
+        final BasicStroke stroke4
+                = new BasicStroke(PERIMETRAL_WALLS_TICKNESS, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER);
         g2.setStroke(stroke4);
         getContext().setColor(PERIMETRAL_WALLS_COLOR_LIGHT);
         g2.drawPolygon(poly);
 
         //center of perimetral wall
-        final BasicStroke stroke =
-                new BasicStroke(PERIMETRAL_WALLS_TICKNESS / 10, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER);
+        final BasicStroke stroke
+                = new BasicStroke(PERIMETRAL_WALLS_TICKNESS / 10, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER);
         g2.setStroke(stroke);
 
         //internal of perimetral wall
         getContext().setColor(PERIMETRAL_WALLS_COLOR);
         g2.drawPolygon(poly);
 
-        final BasicStroke stroke2 =
-                new BasicStroke(PERIMETRAL_WALLS_TICKNESS / 4, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER);
+        final BasicStroke stroke2
+                = new BasicStroke(PERIMETRAL_WALLS_TICKNESS / 4, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER);
         g2.setStroke(stroke2);
         getContext().setColor(PERIMETRAL_WALLS_COLOR_DARK);
         g2.drawPolygon(poly);
@@ -193,8 +195,8 @@ public class PlainDrawer
 
         g2.drawPolygon(poly);
 
-        final BasicStroke stroke2 =
-                new BasicStroke(INTERNAL_WALLS_TICKNESS, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER);
+        final BasicStroke stroke2
+                = new BasicStroke(INTERNAL_WALLS_TICKNESS, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER);
         g2.setStroke(stroke2);
 
         Color walls2 = INTERNAL_WALLS_COLOR_DARK;
@@ -254,7 +256,7 @@ public class PlainDrawer
     @Override
     public void mouseClickObject(EnvObjectLogic obj) {
         ObjectReceiveClick event = new ObjectReceiveClick(this, obj, ObjectReceiveClick.SINGLE_CLICK);
-        Freedomotic.sendEvent(event);
+        master.notifyEvent(event);
     }
 
     /**
@@ -264,7 +266,7 @@ public class PlainDrawer
     @Override
     public void mouseDoubleClickObject(EnvObjectLogic obj) {
         ObjectReceiveClick event = new ObjectReceiveClick(this, obj, ObjectReceiveClick.DOUBLE_CLICK);
-        Freedomotic.sendEvent(event);
+        master.notifyEvent(event);
     }
 
     /**
@@ -274,6 +276,6 @@ public class PlainDrawer
     @Override
     public void mouseRightClickObject(EnvObjectLogic obj) {
         ObjectReceiveClick event = new ObjectReceiveClick(this, obj, ObjectReceiveClick.RIGHT_CLICK);
-        Freedomotic.sendEvent(event);
+        master.notifyEvent(event);
     }
 }

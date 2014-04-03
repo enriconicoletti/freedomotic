@@ -884,7 +884,7 @@ public class MainWindow
     private void closeFreedomotic() {
         GenericEvent exitSignal = new GenericEvent(this);
         exitSignal.setDestination("app.event.system.exit");
-        Freedomotic.sendEvent(exitSignal);
+        master.notifyEvent(exitSignal);
     }
 
     /**

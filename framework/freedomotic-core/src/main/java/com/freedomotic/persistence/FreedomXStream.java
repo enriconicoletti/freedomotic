@@ -79,6 +79,7 @@ public class FreedomXStream {
             xstream.omitField(Trigger.class, "suspensionStart");
             xstream.omitField(Trigger.class, "listener");
             xstream.omitField(Trigger.class, "checker");
+            xstream.omitField(Trigger.class, "busService");
             xstream.alias("payload", Payload.class);
 
             // Register custom converters

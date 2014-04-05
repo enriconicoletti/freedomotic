@@ -44,7 +44,7 @@ public class ZonesServerResource extends ServerResource implements ZonesResource
     protected void doInit() throws ResourceException {
 
         int env = Integer.parseInt((String) getRequest().getAttributes().get("env"));
-        zones = EnvironmentPersistence.getEnvironments().get(env).getPojo().getZones();
+        zones = (ArrayList<Zone>) EnvironmentPersistence.getEnvironments().get(env).getPojo().getZones();
     }
 
     @Override

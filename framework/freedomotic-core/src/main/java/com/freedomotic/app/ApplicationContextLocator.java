@@ -7,6 +7,7 @@ package com.freedomotic.app;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -32,5 +33,9 @@ public class ApplicationContextLocator {
         ApplicationContextLocator.applicationContext = applicationContext;
     }
 
-}
+    public static void forceInjection(Object object) {
+        AutowireCapableBeanFactory factory = getApplicationContext().getAutowireCapableBeanFactory();
+        factory.autowireBean(object);
+    }
 
+}

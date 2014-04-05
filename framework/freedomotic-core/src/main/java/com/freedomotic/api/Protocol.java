@@ -19,9 +19,7 @@
  */
 package com.freedomotic.api;
 
-import com.freedomotic.app.Freedomotic;
 import com.freedomotic.bus.BusConsumer;
-import com.freedomotic.bus.BusService;
 import com.freedomotic.events.PluginHasChanged;
 import com.freedomotic.exceptions.UnableToExecuteException;
 import com.freedomotic.reactions.Command;

@@ -61,15 +61,12 @@ public class Plugin implements Client, BusConsumer {
     final static int SAME_VERSION = 0;
     final static int FIRST_IS_OLDER = -1;
     final static int LAST_IS_OLDER = 1;
+    private BusMessagesListener listener;
+    public Config configuration;
     @Autowired
     private API api;
     @Autowired
     protected BusService busService;
-    //@Autowired 
-    private BusMessagesListener listener;
-    //@Autowired 
-    //private AutowireCapableBeanFactory beanFactory;
-    public Config configuration;
 
     private static final String ACTUATORS_QUEUE_DOMAIN = "app.actuators.";
 

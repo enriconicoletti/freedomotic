@@ -36,7 +36,7 @@ public class Properties implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    HashMap<String, String> propertyList;
+    private HashMap<String, String> propertyList;
 
     /**
      *

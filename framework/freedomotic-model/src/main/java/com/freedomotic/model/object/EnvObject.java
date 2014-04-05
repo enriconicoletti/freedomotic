@@ -19,7 +19,6 @@
  */
 package com.freedomotic.model.object;
 
-import com.freedomotic.model.environment.Environment;
 import com.freedomotic.model.geometry.FreedomShape;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,7 +34,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.transaction.annotation.Transactional;

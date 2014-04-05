@@ -1,22 +1,20 @@
 /**
  *
- * Copyright (c) 2009-2013 Freedomotic team
- * http://freedomotic.com
+ * Copyright (c) 2009-2013 Freedomotic team http://freedomotic.com
  *
  * This file is part of Freedomotic
  *
- * This Program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * This Program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2, or (at your option) any later version.
  *
- * This Program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This Program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Freedomotic; see the file COPYING.  If not, see
+ * You should have received a copy of the GNU General Public License along with
+ * Freedomotic; see the file COPYING. If not, see
  * <http://www.gnu.org/licenses/>.
  */
 /*
@@ -26,11 +24,9 @@
 package com.freedomotic.events;
 
 import com.freedomotic.api.EventTemplate;
-import com.freedomotic.app.Freedomotic;
+import com.freedomotic.app.ApplicationContextLocator;
 import com.freedomotic.core.TriggerCheck;
 import com.freedomotic.reactions.Trigger;
-import com.google.inject.Inject;
-import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,12 +39,13 @@ import org.springframework.stereotype.Component;
 @Component
 public final class ProtocolRead extends EventTemplate {
 
-    String protocol;
+    private String protocol;
+    private String address;
     @Autowired
     private TriggerCheck triggerCheck;
-    
+
     public ProtocolRead() {
-        
+
     }
 
     /**
@@ -65,6 +62,22 @@ public final class ProtocolRead extends EventTemplate {
         generateEventPayload();
     }
 
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+    
     /**
      *
      */
@@ -72,6 +85,7 @@ public final class ProtocolRead extends EventTemplate {
     protected void generateEventPayload() {
         //this is not a good idea but it works for now
         //Freedomotic.INJECTOR.injectMembers(this);
+        ApplicationContextLocator.forceInjection(this);
     }
 
     /**
@@ -108,5 +122,4 @@ public final class ProtocolRead extends EventTemplate {
             return "app.event.sensor.protocol.read." + protocol.trim().toLowerCase();
         }
     }
-    private static final Logger LOG = Logger.getLogger(ProtocolRead.class.getName());
 }

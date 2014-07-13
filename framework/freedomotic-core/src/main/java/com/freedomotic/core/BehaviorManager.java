@@ -92,7 +92,7 @@ public final class BehaviorManager
      * Register one or more channels to listen to
      */
     private void register() {
-        listener = new BusMessagesListener(this);
+        listener = new BusMessagesListener(this, busService);
         listener.consumeCommandFrom(getMessagingChannel());
     }
 

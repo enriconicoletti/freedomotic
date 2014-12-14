@@ -41,6 +41,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -52,6 +53,9 @@ import javax.ws.rs.core.Response;
 @Path("objects")
 @Api(value = "/objects", description = "Operations on environment objects", position = 2)
 public class ThingResource extends AbstractResource<EnvObject> {
+    
+    @Inject
+    ClientStorage clientStorage;
 
     private String envUUID = null;
     private String roomName = null;
@@ -259,8 +263,6 @@ public class ThingResource extends AbstractResource<EnvObject> {
         throw new ItemNotFoundException();
     }
 
-    private static final ClientStorage clientStorage = INJECTOR.getInstance(ClientStorage.class
-    );
 
     @GET
     @Path("/templates")

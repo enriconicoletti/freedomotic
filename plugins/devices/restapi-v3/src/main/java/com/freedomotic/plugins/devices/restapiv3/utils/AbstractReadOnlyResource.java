@@ -20,17 +20,15 @@
 package com.freedomotic.plugins.devices.restapiv3.utils;
 
 import com.freedomotic.api.API;
-import com.freedomotic.app.FreedomoticInjector;
 import com.freedomotic.plugins.devices.restapiv3.filters.ForbiddenException;
 import com.freedomotic.plugins.devices.restapiv3.filters.ItemNotFoundException;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
@@ -47,11 +45,10 @@ import javax.ws.rs.core.Response;
 public abstract class AbstractReadOnlyResource<T> implements ResourceReadOnlyInterface<T> {
 
     public static final Logger LOG = Logger.getLogger(AbstractReadOnlyResource.class.getName());
-    protected final static Injector INJECTOR = Guice.createInjector(new FreedomoticInjector());
-    protected final static API api = INJECTOR.getInstance(API.class);
     protected String authContext = "*";
     
-    
+    @Inject
+    protected API api;
     
     /**
      * 

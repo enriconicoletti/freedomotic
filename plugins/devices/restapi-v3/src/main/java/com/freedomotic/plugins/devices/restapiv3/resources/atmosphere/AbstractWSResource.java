@@ -39,7 +39,6 @@ public abstract class AbstractWSResource implements WebSocketEndpoint {
     protected ObjectMapper om;
 
     public AbstractWSResource() {
-        //api = Freedomotic.INJECTOR.getInstance(API.class);
         om = new ObjectMapper();
         // JAXB annotation
         AnnotationIntrospector jaxbIntrospector = new JaxbAnnotationIntrospector(TypeFactory.defaultInstance());

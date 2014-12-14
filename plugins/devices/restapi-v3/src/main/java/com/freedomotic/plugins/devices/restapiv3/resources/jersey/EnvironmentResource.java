@@ -153,7 +153,7 @@ public class EnvironmentResource extends AbstractResource<Environment> {
 
     @Override
     protected URI doCreate(Environment eo) throws URISyntaxException {
-        EnvironmentLogic el = INJECTOR.getInstance(EnvironmentLogic.class);
+        EnvironmentLogic el = new EnvironmentLogic();
         el.setPojo(eo);
         api.environments().create(el);
         return createUri(el.getPojo().getUUID());
@@ -161,7 +161,7 @@ public class EnvironmentResource extends AbstractResource<Environment> {
 
     @Override
     protected Environment doUpdate(String UUID, Environment eo) {
-        EnvironmentLogic el = INJECTOR.getInstance(EnvironmentLogic.class);
+        EnvironmentLogic el = new EnvironmentLogic();
         eo.setUUID(UUID);
         el.setPojo(eo);
         if (api.environments().modify(UUID, el) != null) {

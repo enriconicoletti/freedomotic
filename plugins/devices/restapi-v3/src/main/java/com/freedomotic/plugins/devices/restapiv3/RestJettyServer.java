@@ -134,7 +134,7 @@ public final class RestJettyServer extends Server {
 
         // guice filter
         context.addEventListener(guiceServletConfig);
-        context.addFilter(GuiceFilter.class, "/*", null);
+        context.addFilter(GuiceFilter.class, "/" + API_VERSION + "/*", null);
 
         //static files handler        
         String staticDir = master.configuration.getStringProperty("serve-static", "swagger");

@@ -8,14 +8,11 @@ package com.freedomotic.plugins.devices.restapiv3.resources.jersey;
 import com.freedomotic.api.API;
 import com.freedomotic.api.Client;
 import com.freedomotic.api.Plugin;
-import com.freedomotic.app.FreedomoticInjector;
 import com.freedomotic.marketplace.IMarketPlace;
 import com.freedomotic.marketplace.IPluginPackage;
 import com.freedomotic.marketplace.MarketPlaceService;
 import com.freedomotic.plugins.PluginsManager;
 import com.freedomotic.util.Info;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -25,6 +22,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -42,8 +40,8 @@ import javax.ws.rs.core.Response;
 @Api(value = "marketplace", description = "Marketplace providers, categories and plugins", position = 100)
 public class MarketplaceResource {
 
-    protected final static Injector INJECTOR = Guice.createInjector(new FreedomoticInjector());
-    protected final static API api = INJECTOR.getInstance(API.class);
+    @Inject
+    private API api;
 
     @Path("/providers")
 //    @ApiOperation("Manage marketplace providers")

@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import com.freedomotic.api.EventTemplate;
 import com.freedomotic.api.Protocol;
 import com.freedomotic.events.ProtocolRead;
+import com.freedomotic.exceptions.PluginStartupException;
 import com.freedomotic.reactions.Command;
 import com.freedomotic.things.EnvObjectLogic;
 import com.freedomotic.things.ThingRepository;
@@ -34,6 +35,10 @@ public class EnergyAtHome extends Protocol {
     private final String protocolName = configuration.getProperty("protocol.name");
     private final int POLLING_TIME = configuration
             .getIntProperty("pollingtime", 1000);
+    // Stores the count of subsequent API connection failures
+    private int connectionFailuresCount = 0;
+    // Max allowed API connection attempts before making the plugin as FAILED
+    private static final int MAX_CONNECTON_FAILURES = 5;
 
     private static final Logger LOG = Logger.getLogger(EnergyAtHome.class
             .getName());
@@ -45,10 +50,17 @@ public class EnergyAtHome extends Protocol {
     }
 
     @Override
-    protected void onStart() {
-        if (!getDevices()) { // exit if no devices were found
-            setPollingWait(-1);
-            super.stop();
+    protected void onStart() throws PluginStartupException {
+        //Important: reset connection failure counter
+        connectionFailuresCount = 0;
+        try {
+            if (!getDevices()) { // exit if no devices were found
+                setPollingWait(-1);
+                super.stop();
+            }
+        } catch (IOException ex) {
+            // Stop the plugin and notify connection problems
+            throw new PluginStartupException("Cannot connect to API at " + flexIP, ex);
         }
     }
 
@@ -67,8 +79,12 @@ public class EnergyAtHome extends Protocol {
             } else {
                 body = "{\"operation\":\"setFalse\"}";
             }
-            postToFlex(flexIP + "api/functions/" + c.getProperty("identifier")
-                    + ":OnOff", body);
+            try {
+                postToFlex(flexIP + "api/functions/" + c.getProperty("identifier")
+                        + ":OnOff", body);
+            } catch (IOException ex) {
+                manageConnectionFailure();
+            }
         }
     }
 
@@ -84,17 +100,36 @@ public class EnergyAtHome extends Protocol {
                 String address = thing.getPojo().getPhisicalAddress();
                 String name = thing.getPojo().getName();
                 String body = "{\"operation\":\"getCurrent\"}";
-                String line = postToFlex(
-                        flexIP + "api/functions/" + address + ":EnergyMeter", body);
+                String line;
                 try {
-                    JSONObject json = new JSONObject(line);
-                    Double value = json.getJSONObject("result").getDouble("level");
-                    LOG.log(Level.INFO, "Object {0}is consuming: {1}W", new Object[]{address, value});
-                    buildEvent(name, address, "powerUsage", String.valueOf(value), null);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    line = postToFlex(
+                            flexIP + "api/functions/" + address + ":EnergyMeter", body);
+                    try {
+                        JSONObject json = new JSONObject(line);
+                        Double value = json.getJSONObject("result").getDouble("level");
+                        LOG.log(Level.INFO, "Object {0}is consuming: {1}W", new Object[]{address, value});
+                        buildEvent(name, address, "powerUsage", String.valueOf(value), null);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } catch (IOException ex) {
+                    manageConnectionFailure();
                 }
+
             }
+        }
+    }
+
+    /**
+     * Counts API connection failures and marks the plugin as FAILED if the
+     * max number of subsequent failed connection is reached.
+     */
+    private void manageConnectionFailure() {
+        connectionFailuresCount++;
+        if (connectionFailuresCount <= MAX_CONNECTON_FAILURES) {
+            setDescription("API connection failed " + connectionFailuresCount + " times");
+        } else {
+            this.notifyCriticalError("Too many API connection failures (" + connectionFailuresCount + " failures)");
         }
     }
 
@@ -102,7 +137,7 @@ public class EnergyAtHome extends Protocol {
      * getDevices() gathers devices linked to flexGW and create\synchronize 
      * them on Freedomotic;  
      */
-    protected boolean getDevices() {
+    protected boolean getDevices() throws IOException {
         String line = getToFlex(flexIP + "api/devices");
         try {
             JSONArray json = new JSONArray(line);
@@ -130,7 +165,7 @@ public class EnergyAtHome extends Protocol {
      * getType(String address) gives the class of a device, 
      * in order to create it on Freedomotic
      */
-    protected String getType(String address) {
+    protected String getType(String address) throws IOException {
         String line = getToFlex(flexIP + "api/devices/" + address
                 + "/functions");
         try {
@@ -159,13 +194,13 @@ public class EnergyAtHome extends Protocol {
         event.addProperty("behaviorValue", value);
         event.addProperty("object.class", type);
         LOG.log(Level.INFO, event.getPayload().toString());
-        notifyEvent(event); 
+        notifyEvent(event);
     }
 
     /*
      * getStatus(String address) gives device status with OnOff function.UID
      */
-    protected boolean getStatus(String address) {
+    protected boolean getStatus(String address) throws IOException {
         boolean status = false;
         String body = "{\"operation\":\"getData\"}";
         String line = postToFlex(
@@ -183,7 +218,7 @@ public class EnergyAtHome extends Protocol {
     /*
      * GET to the flexGW
      */
-    private String getToFlex(String urlToInvoke) {
+    private String getToFlex(String urlToInvoke) throws IOException {
         String line = null;
         try {
             url = new URL(urlToInvoke.replaceAll(" ", "%20"));
@@ -192,11 +227,11 @@ public class EnergyAtHome extends Protocol {
             BufferedReader read = new BufferedReader(new InputStreamReader(
                     connection.getInputStream()));
             line = read.readLine();
+            // Succesfull connection, reset connection failures counter
+            connectionFailuresCount = 0;
         } catch (MalformedURLException e) {
             LOG.log(Level.INFO,
                     "Malformed URL! Please check IP address in manifest.xml!");
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return line;
     }
@@ -204,7 +239,7 @@ public class EnergyAtHome extends Protocol {
     /*
      * POST to the flexGW
      */
-    private String postToFlex(String urlToInvoke, String body) {
+    private String postToFlex(String urlToInvoke, String body) throws IOException {
         try {
             url = new URL(urlToInvoke.replaceAll(" ", "%20"));
             connection = (HttpURLConnection) url.openConnection();
@@ -224,12 +259,12 @@ public class EnergyAtHome extends Protocol {
             BufferedReader read = new BufferedReader(new InputStreamReader(
                     connection.getInputStream()));
             String line = read.readLine();
+            // Succesfull connection, reset connection failures counter
+            connectionFailuresCount = 0;
             return line;
         } catch (MalformedURLException e) {
             LOG.log(Level.INFO,
                     "Malformed URL! Please check IP address in manifest.xml!");
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return null;
     }
